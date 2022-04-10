@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>685</width>
+    <height>514</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QMdiArea" name="mdiArea"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>685</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="create_project"/>
+    <addaction name="open"/>
+    <addaction name="action_5"/>
+    <addaction name="separator"/>
+    <addaction name="close"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Окна</string>
+    </property>
+    <addaction name="action_6"/>
+    <addaction name="action_3"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>Помощь</string>
+    </property>
+    <addaction name="action_7"/>
+   </widget>
+   <widget class="QMenu" name="menu_4">
+    <property name="title">
+     <string>Данные</string>
+    </property>
+    <addaction name="action_2"/>
+    <addaction name="action_9"/>
+    <addaction name="action_10"/>
+    <addaction name="action_11"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_4"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
+  </widget>
+  <action name="open">
+   <property name="text">
+    <string>Открыть проект</string>
+   </property>
+  </action>
+  <action name="close">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="action_5">
+   <property name="text">
+    <string>Сохранить всё</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>Инструменты</string>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>Управление</string>
+   </property>
+  </action>
+  <action name="action_7">
+   <property name="text">
+    <string>О программе</string>
+   </property>
+  </action>
+  <action name="create_project">
+   <property name="text">
+    <string>Создать проект</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>Добавить таблицу</string>
+   </property>
+  </action>
+  <action name="action_9">
+   <property name="text">
+    <string>Открыть таблицу</string>
+   </property>
+  </action>
+  <action name="action_10">
+   <property name="text">
+    <string>Удалить таблицу</string>
+   </property>
+  </action>
+  <action name="action_11">
+   <property name="text">
+    <string>Запрос</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -9,22 +9,27 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    createprojectform.cpp \
+    displayedobject.cpp \
+    layer.cpp \
+    line.cpp \
     main.cpp \
-    mainwindow.cpp
+    map.cpp \
+    point.cpp \
+    polygon.cpp \
+    polyline.cpp \
+    text.cpp \
+    viewer.cpp
 
 HEADERS += \
-    createprojectform.h \
-    mainwindow.h
-
-FORMS += \
-    createprojectform.ui \
-    mainwindow.ui
-
-TRANSLATIONS += \
-    MapDesigner_ru_RU.ts
-CONFIG += lrelease
-CONFIG += embed_translations
+    displayedobject.h \
+    layer.h \
+    line.h \
+    map.h \
+    point.h \
+    polygon.h \
+    polyline.h \
+    text.h \
+    viewer.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

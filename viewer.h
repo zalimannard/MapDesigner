@@ -17,8 +17,25 @@ private:
     void createActions();
     void createMenus();
 
-    QAction *aboutAct;
+    QAction *createProjectAct;
+    QAction *openProjectAct;
+    QAction *saveProjectAct;
+    QAction *exitAct;
 
+    QAction *createTableAct;
+    QAction *openTableAct;
+    QAction *deleteTableAct;
+    QAction *requestAct;
+
+    QAction *layersAct;
+    QAction *toolsAct;
+
+    QAction *aboutProgramAct;
+
+
+    QMenu *fileMenu;
+    QMenu *tablesMenu;
+    QMenu *windowMenu;
     QMenu *helpMenu;
 };
 #endif // VIEWER_H

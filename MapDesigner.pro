@@ -17,6 +17,7 @@ SOURCES += \
     point.cpp \
     polygon.cpp \
     polyline.cpp \
+    project.cpp \
     text.cpp \
     viewer.cpp
 
@@ -28,6 +29,7 @@ HEADERS += \
     point.h \
     polygon.h \
     polyline.h \
+    project.h \
     text.h \
     viewer.h
 

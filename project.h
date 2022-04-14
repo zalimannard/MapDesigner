@@ -1,11 +1,20 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
+#include <QString>
 
 class Project
 {
 public:
-    Project();
+    Project(const QString &name);
+
+    void save(const QString &path) const;
+
+    QString getName() const;
+
+private:
+    QString name_;
+
 };
 
 #endif // PROJECT_H

@@ -16,7 +16,7 @@ public:
 
 private:
     Project *project_ = nullptr;
-    QString prejectPath = "";
+    QString projectDirPath_ = "";
 
     void createActions();
     void createMenus();

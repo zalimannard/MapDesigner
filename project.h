@@ -9,6 +9,7 @@ public:
     Project(const QString &name);
 
     void save(const QString &path) const;
+    void open(const QString &path);
 
     QString getName() const;
 

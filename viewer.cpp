@@ -2,6 +2,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QVector>
 
 #include "viewer.h"
 #include "project.h"
@@ -83,7 +84,7 @@ void Viewer::createMenus()
     fileMenu = new QMenu(tr("&Файл"), this);
     fileMenu->addAction(createProjectAct);
     fileMenu->addAction(openProjectAct);
-    fileMenu->addAction(saveProjectAct);
+    fileMenu->addAction(saveProjectAsAct);
     fileMenu->addSeparator();
     fileMenu->addAction(selectMapAct);
     fileMenu->addSeparator();
@@ -115,10 +116,10 @@ void Viewer::createMenus()
 
 void Viewer::createProject()
 {
-    QString path = QFileDialog::getExistingDirectory(0, "Создание проекта", "");
-    if (!path.isEmpty())
+    QString projectDirPath = QFileDialog::getExistingDirectory(0, "Создание проекта", "");
+    if (!projectDirPath.isEmpty())
     {
-        if (QDir(path).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() == 0)
+        if (QDir(projectDirPath).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() == 0)
         {
             QString projectName = QInputDialog::getText(
                                   this,
@@ -128,39 +129,70 @@ void Viewer::createProject()
             if (!projectName.isEmpty())
             {
                 project_ = new Project(projectName);
-                project_->save(path);
-                QMessageBox::warning(this, "Имя проекта не введено",
-                                     path + " " + projectName);
+                projectDirPath_ = projectDirPath;
+                project_->save(projectDirPath_);
             }
             else
             {
-                QMessageBox::warning(this, "Имя проекта не введено",
-                                     "<p><b>Директория не пуста</b></p>"
-                                     "<p>Выберите другую или очистите эту</p>");
+                QMessageBox::critical(this, "Имя проекта не введено",
+                                      "<b>Имя проекта не введено</b>");
             }
         }
         else
         {
-            QMessageBox::warning(this, "Директория не пуста",
-                                 "<p><b>Директория не пуста</b></p>"
-                                 "<p>Выберите другую или очистите эту</p>");
+            QMessageBox::critical(this, "Директория не пуста",
+                                  "<p><b>Директория не пуста</b></p>"
+                                  "<p>Выберите другую или очистите эту</p>");
         }
     }
 }
 
 void Viewer::openProject()
 {
-
+    QString projectFilePath = QFileDialog::getOpenFileName(
+                this, tr("Открыть проект"), QDir::currentPath(), tr("Файл проекта (*.mdp)"));
+    QString projectName = projectFilePath.split("/").last().split(".").first();
+    QString projectDirPath = projectFilePath.remove(projectFilePath.lastIndexOf("/"), projectName.length() + 1);
+    project_ = new Project(projectName);
+    projectDirPath_ = projectDirPath;
+    project_->open(projectDirPath_);
 }
 
 void Viewer::saveProject()
 {
-
+    project_->save(projectDirPath_);
 }
 
 void Viewer::saveProjectAs()
 {
-
+    QString projectDirPath = QFileDialog::getExistingDirectory(0, "Создание проекта", "");
+    if (!projectDirPath.isEmpty())
+    {
+        if (QDir(projectDirPath).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).count() == 0)
+        {
+            QString projectName = QInputDialog::getText(
+                                  this,
+                                  QString::fromUtf8("Введите название проекта"),
+                                  QString::fromUtf8("Название проекта:"),
+                                  QLineEdit::Normal);
+            if (!projectName.isEmpty())
+            {
+                projectDirPath_ = projectDirPath;
+                project_->save(projectDirPath_);
+            }
+            else
+            {
+                QMessageBox::warning(this, "Имя проекта не введено",
+                                     "<b>Имя проекта не введено</b>");
+            }
+        }
+        else
+        {
+            QMessageBox::critical(this, "Директория не пуста",
+                                  "<p><b>Директория не пуста</b></p>"
+                                  "<p>Выберите другую или очистите эту</p>");
+        }
+    }
 }
 
 void Viewer::selectMap()

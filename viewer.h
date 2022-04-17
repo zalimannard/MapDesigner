@@ -9,6 +9,7 @@
 #include <QScrollArea>
 #include <QGraphicsSceneWheelEvent>
 #include "project.h"
+#include "myscrollarea.h"
 
 class Viewer : public QMainWindow
 {
@@ -30,7 +31,7 @@ private:
     void repaint();
 
     QLabel *imageLabel;
-    QScrollArea *scrollArea;
+    MyScrollArea *scrollArea;
     qreal scaleFactor_ = 1.0;
 
     QAction *createProjectAct;

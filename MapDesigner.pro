@@ -14,6 +14,7 @@ SOURCES += \
     line.cpp \
     main.cpp \
     map.cpp \
+    myscrollarea.cpp \
     point.cpp \
     polygon.cpp \
     polyline.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     layer.h \
     line.h \
     map.h \
+    myscrollarea.h \
     point.h \
     polygon.h \
     polyline.h \

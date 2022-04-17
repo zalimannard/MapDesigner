@@ -6,6 +6,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QDebug>
+#include <QDrag>
 
 #include "viewer.h"
 #include "project.h"
@@ -18,7 +19,7 @@ Viewer::Viewer(QWidget *parent)
     imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     imageLabel->setScaledContents(true);
 
-    scrollArea = new QScrollArea;
+    scrollArea = new MyScrollArea;
     scrollArea->setBackgroundRole(QPalette::Dark);
     scrollArea->setAlignment(Qt::AlignCenter);
     scrollArea->setWidget(imageLabel);
@@ -332,7 +333,7 @@ void Viewer::aboutProgram()
 
 void Viewer::mousePressEvent(QMouseEvent *event)
 {
-//    switch (event->button()) {
+    switch (event->button()) {
 //        case Qt::LeftButton:
 //        {
 //        QMessageBox::warning(this, "Имя проекта не введено",
@@ -345,19 +346,15 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 //                             "<b>Имя проекта не введено</b>");
 //            break;
 //        }
-//        case Qt::MiddleButton:
-//        {
-//        QMessageBox::warning(this, "Имя проекта не введено",
-//                             "<b>Имя проекта не введено</b>");
-//            break;
-//        }
-//        default:
-//        {
-//        QMessageBox::warning(this, "Имя проекта не введено",
-//                             "<b>Имя проекта не введено</b>");
-//            break;
-//        }
-//    }
+        case Qt::MiddleButton:
+        {
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
 
     repaint();
 }

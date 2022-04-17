@@ -4,6 +4,7 @@
 #include <QString>
 #include <QVector>
 #include <QPair>
+#include "point.h"
 
 #include "displayedobject.h"
 
@@ -12,13 +13,14 @@ class Map : public DisplayedObject
 public:
     Map(QString pathToImage);
     QString getPathToImage();
-    void addPoint(double pixel, double coordinateX, double coordinateY);
-
-    void removePoint(qint64 index);
+    void setMainPoint(Point imagePoint, Point mapPoint);
 
 private:
-    QString pathToImage;
-    QVector<QPair<double, double> > pixelAndCoordinates;
+    Point *mainPointImage_;
+    Point *mainPointMap_;
+    qreal latitudePerPixel_ = 0.0;
+    qreal longitudePerPixel_ = 0.0;
+    QString pathToImage_;
 };
 
 #endif // MAP_H

@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QAction>
 #include <QMenu>
+#include <QScrollBar>
+#include <QLabel>
+#include <QScrollArea>
+#include <QGraphicsSceneWheelEvent>
 #include "project.h"
 
 class Viewer : public QMainWindow
@@ -20,6 +24,14 @@ private:
 
     void createActions();
     void createMenus();
+    void updateActions();
+    void scaleImage(double factor);
+    void adjustScrollBar(QScrollBar *scrollBar, double factor);
+    void repaint();
+
+    QLabel *imageLabel;
+    QScrollArea *scrollArea;
+    qreal scaleFactor_ = 1.0;
 
     QAction *createProjectAct;
     QAction *openProjectAct;
@@ -27,6 +39,11 @@ private:
     QAction *saveProjectAsAct;
     QAction *selectMapAct;
     QAction *exitAct;
+
+    QAction *zoomInAct;
+    QAction *zoomOutAct;
+    QAction *normalSizeAct;
+    QAction *fitSizeAct;
 
     QAction *createTableAct;
     QAction *openTableAct;
@@ -40,17 +57,27 @@ private:
 
 
     QMenu *fileMenu;
+    QMenu *editMenu;
     QMenu *tablesMenu;
     QMenu *windowMenu;
     QMenu *helpMenu;
 
 private slots:
+
+    void mousePressEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
+
     void createProject();
     void openProject();
     void saveProject();
     void saveProjectAs();
     void selectMap();
     void exit();
+
+    void zoomIn();
+    void zoomOut();
+    void fitSize();
+    void normalSize();
 
     void createTable();
     void openTable();

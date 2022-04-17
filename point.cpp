@@ -2,61 +2,28 @@
 
 #include "point.h"
 
-Point::Point(const qreal &latitude, const qreal &longitude)
+Point::Point(const qreal &x, const qreal &y)
 {
-    latitude_ = latitude;
-    longitude_ = longitude;
+    setX(x);
+    setY(y);
 }
 
-qreal Point::distance(const Point &other) const
+qreal Point::getX() const
 {
-    qreal earthRadius = 6371009; // In meters
-    qreal phi1 = qDegreesToRadians(this->getLatitude());
-    qreal phi2 = qDegreesToRadians(other.getLatitude());
-    qreal lambda1 = qDegreesToRadians(this->getLatitude());
-    qreal lambda2 = qDegreesToRadians(other.getLongitude());
-    return 2 * earthRadius * qAsin(qSqrt(
-            (qPow(qSin((phi2 - phi1) / 2), 2)) +
-                qCos(phi1) * qCos(phi2) *
-                qPow(qSin((lambda2 - lambda1) / 2), 2)));
+    return x_;
 }
 
-bool Point::isNorth(const Point &other) const
+void Point::setX(const qreal &value)
 {
-    return latitude_ > other.getLatitude();
+    x_ = value;
+}
+qreal Point::getY() const
+{
+    return y_;
 }
 
-bool Point::isEast(const Point &other) const
+void Point::setY(const qreal &value)
 {
-    return this->longitude_ > other.getLongitude();
+    y_ = value;
 }
 
-bool Point::isSouth(const Point &other) const
-{
-    return latitude_ < other.getLatitude();
-}
-
-bool Point::isWest(const Point &other) const
-{
-    return latitude_ < other.getLatitude();
-}
-
-qreal Point::getLatitude() const
-{
-    return latitude_;
-}
-
-void Point::setLatitude(const qreal &value)
-{
-    latitude_ = value;
-}
-
-qreal Point::getLongitude() const
-{
-    return longitude_;
-}
-
-void Point::setLongitude(const qreal &value)
-{
-    longitude_ = value;
-}

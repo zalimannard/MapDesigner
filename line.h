@@ -22,8 +22,6 @@ public:
     qint64 getWidth() const;
     void setWidth(const qint64 &width);
 
-    // void draw(Где рисовать);
-
 private:
     Point start_;
     Point finish_;

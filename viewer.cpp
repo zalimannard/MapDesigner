@@ -3,6 +3,9 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QVector>
+#include <QMouseEvent>
+#include <QWheelEvent>
+#include <QDebug>
 
 #include "viewer.h"
 #include "project.h"
@@ -10,8 +13,22 @@
 Viewer::Viewer(QWidget *parent)
     : QMainWindow(parent)
 {
+    imageLabel = new QLabel;
+    imageLabel->setBackgroundRole(QPalette::Base);
+    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    imageLabel->setScaledContents(true);
+
+    scrollArea = new QScrollArea;
+    scrollArea->setBackgroundRole(QPalette::Dark);
+    scrollArea->setAlignment(Qt::AlignCenter);
+    scrollArea->setWidget(imageLabel);
+    setCentralWidget(scrollArea);
+
     createActions();
     createMenus();
+
+    setWindowTitle(tr("Map Designer"));
+    resize(1280, 720);
 }
 
 Viewer::~Viewer()
@@ -43,6 +60,23 @@ void Viewer::createActions()
     exitAct = new QAction(tr("&Выйти"), this);
     exitAct->setShortcut(tr("Ctrl+Q"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(exit()));
+
+
+    zoomInAct = new QAction(tr("&Приблизить"), this);
+    zoomInAct->setShortcut(tr("Ctrl++"));
+    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(zoomIn()));
+
+    zoomOutAct = new QAction(tr("&Отдалить"), this);
+    zoomOutAct->setShortcut(tr("Ctrl+-"));
+    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(zoomOut()));
+
+    normalSizeAct = new QAction(tr("&Нормальный размер"), this);
+    normalSizeAct->setShortcut(tr("Ctrl+="));
+    connect(normalSizeAct, SIGNAL(triggered()), this, SLOT(normalSize()));
+
+    fitSizeAct = new QAction(tr("&Вместить"), this);
+    fitSizeAct->setShortcut(tr("Ctrl+_"));
+    connect(fitSizeAct, SIGNAL(triggered()), this, SLOT(fitSize()));
 
 
     createTableAct = new QAction(tr("&Создать таблицу"), this);
@@ -84,11 +118,18 @@ void Viewer::createMenus()
     fileMenu = new QMenu(tr("&Файл"), this);
     fileMenu->addAction(createProjectAct);
     fileMenu->addAction(openProjectAct);
+    fileMenu->addAction(saveProjectAct);
     fileMenu->addAction(saveProjectAsAct);
     fileMenu->addSeparator();
     fileMenu->addAction(selectMapAct);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
+
+    editMenu = new QMenu(tr("&Правка"), this);
+    editMenu->addAction(zoomInAct);
+    editMenu->addAction(zoomOutAct);
+    editMenu->addAction(normalSizeAct);
+    editMenu->addAction(fitSizeAct);
 
     tablesMenu = new QMenu(tr("&Таблица"), this);
     tablesMenu->addAction(createTableAct);
@@ -108,11 +149,26 @@ void Viewer::createMenus()
 
 
     menuBar()->addMenu(fileMenu);
+    menuBar()->addMenu(editMenu);
     menuBar()->addMenu(tablesMenu);
     menuBar()->addMenu(windowMenu);
     menuBar()->addMenu(helpMenu);
 }
 
+void Viewer::repaint()
+{
+    if (project_ != nullptr)
+    {
+        if (project_->isMapExist())
+        {
+            QImage image(project_->getMap().getPathToImage());
+            QPixmap pixmap(QPixmap::fromImage(image));
+
+            imageLabel->setPixmap(pixmap);
+            imageLabel->resize(image.width() * scaleFactor_, image.height() * scaleFactor_);
+        }
+    }
+}
 
 void Viewer::createProject()
 {
@@ -145,6 +201,7 @@ void Viewer::createProject()
                                   "<p>Выберите другую или очистите эту</p>");
         }
     }
+    repaint();
 }
 
 void Viewer::openProject()
@@ -152,15 +209,17 @@ void Viewer::openProject()
     QString projectFilePath = QFileDialog::getOpenFileName(
                 this, tr("Открыть проект"), QDir::currentPath(), tr("Файл проекта (*.mdp)"));
     QString projectName = projectFilePath.split("/").last().split(".").first();
-    QString projectDirPath = projectFilePath.remove(projectFilePath.lastIndexOf("/"), projectName.length() + 1);
+    QString projectDirPath = projectFilePath.remove(projectFilePath.lastIndexOf("/"), projectFilePath.split("/").last().length() + 1);
     project_ = new Project(projectName);
     projectDirPath_ = projectDirPath;
     project_->open(projectDirPath_);
+    repaint();
 }
 
 void Viewer::saveProject()
 {
     project_->save(projectDirPath_);
+    repaint();
 }
 
 void Viewer::saveProjectAs()
@@ -193,16 +252,46 @@ void Viewer::saveProjectAs()
                                   "<p>Выберите другую или очистите эту</p>");
         }
     }
+    repaint();
 }
 
 void Viewer::selectMap()
 {
+    QString mapPath = QFileDialog::getOpenFileName(
+                this, tr("Выбрать карту"), QDir::currentPath(), tr("Image (*.jpg *.png *.gif)"));
+    project_->setMap(mapPath);
 
+    repaint();
 }
 
 void Viewer::exit()
 {
     close();
+}
+
+void Viewer::zoomIn()
+{
+    scaleFactor_ *= 1.1;
+    repaint();
+}
+
+void Viewer::zoomOut()
+{
+    scaleFactor_ /= 1.1;
+    repaint();
+}
+
+void Viewer::normalSize()
+{
+    scaleFactor_ = 1;
+    repaint();
+}
+
+void Viewer::fitSize()
+{
+    QImage image(project_->getMap().getPathToImage());
+    scaleFactor_ = qMin((qreal)scrollArea->height() / image.height(), (qreal)scrollArea->width() / image.width());
+    repaint();
 }
 
 void Viewer::createTable()
@@ -239,4 +328,50 @@ void Viewer::aboutProgram()
 {
     QMessageBox::about(this, tr("О MapDesigner"),
             tr("<p>Ура программа</p>"));
+}
+
+void Viewer::mousePressEvent(QMouseEvent *event)
+{
+//    switch (event->button()) {
+//        case Qt::LeftButton:
+//        {
+//        QMessageBox::warning(this, "Имя проекта не введено",
+//                             "<b>Имя проекта не введено</b>");
+//            break;
+//        }
+//        case Qt::RightButton:
+//        {
+//        QMessageBox::warning(this, "Имя проекта не введено",
+//                             "<b>Имя проекта не введено</b>");
+//            break;
+//        }
+//        case Qt::MiddleButton:
+//        {
+//        QMessageBox::warning(this, "Имя проекта не введено",
+//                             "<b>Имя проекта не введено</b>");
+//            break;
+//        }
+//        default:
+//        {
+//        QMessageBox::warning(this, "Имя проекта не введено",
+//                             "<b>Имя проекта не введено</b>");
+//            break;
+//        }
+//    }
+
+    repaint();
+}
+
+void Viewer::wheelEvent(QWheelEvent *event)
+{
+    QPoint numDegrees = event->angleDelta() / 8;
+
+    if (numDegrees.y() > 0)
+    {
+        zoomIn();
+    }
+    else
+    {
+        zoomOut();
+    }
 }

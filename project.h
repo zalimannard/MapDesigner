@@ -2,6 +2,7 @@
 #define PROJECT_H
 
 #include <QString>
+#include "map.h"
 
 class Project
 {
@@ -11,10 +12,15 @@ public:
     void save(const QString &path) const;
     void open(const QString &path);
 
+    void setMap(const QString &path);
+    Map getMap() const;
+    bool isMapExist() const;
+
     QString getName() const;
 
 private:
     QString name_;
+    Map *map_ = nullptr;
 
 };
 

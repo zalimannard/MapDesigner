@@ -6,22 +6,16 @@
 class Point
 {
 public:
-    Point(const qreal &latitude, const qreal &longitude);
+    Point(const qreal &x, const qreal &y);
 
-    qreal distance(const Point &other) const;
-    bool isNorth(const Point &other) const;
-    bool isEast(const Point &other) const;
-    bool isSouth(const Point &other) const;
-    bool isWest(const Point &other) const;
-
-    qreal getLatitude() const;
-    void setLatitude(const qreal &value);
-    qreal getLongitude() const;
-    void setLongitude(const qreal &value);
+    qreal getX() const;
+    void setX(const qreal &value);
+    qreal getY() const;
+    void setY(const qreal &value);
 
 private:
-    qreal latitude_;
-    qreal longitude_;
+    qreal x_;
+    qreal y_;
 };
 
 #endif // POINT_H

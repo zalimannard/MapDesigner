@@ -18,6 +18,8 @@ public:
 
     QString getName() const;
 
+    QVector<DisplayedObject> layers;
+
 private:
     QString name_;
     Map *map_ = nullptr;

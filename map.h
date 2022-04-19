@@ -14,6 +14,7 @@ public:
     Map(QString pathToImage);
     QString getPathToImage();
     void setMainPoint(Point imagePoint, Point mapPoint);
+    bool isBinded();
 
 private:
     Point *mainPointImage_;

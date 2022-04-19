@@ -7,6 +7,11 @@
 #include <QWheelEvent>
 #include <QDebug>
 #include <QDrag>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QGroupBox>
 
 #include "viewer.h"
 #include "project.h"
@@ -27,6 +32,8 @@ Viewer::Viewer(QWidget *parent)
 
     createActions();
     createMenus();
+    createToolbar();
+    createLayerDock();
 
     setWindowTitle(tr("Map Designer"));
     resize(1280, 720);
@@ -100,11 +107,13 @@ void Viewer::createActions()
     layersAct = new QAction(tr("&Слои"), this);
     layersAct->setShortcut(tr("Ctrl+L"));
     layersAct->setCheckable(true);
+    layersAct->setChecked(true);
     connect(layersAct, SIGNAL(triggered()), this, SLOT(layers()));
 
     toolsAct = new QAction(tr("&Инструменты"), this);
     toolsAct->setShortcut(tr("Ctrl+T"));
     toolsAct->setCheckable(true);
+    toolsAct->setChecked(true);
     connect(toolsAct, SIGNAL(triggered()), this, SLOT(tools()));
 
 
@@ -112,6 +121,29 @@ void Viewer::createActions()
     aboutProgramAct->setShortcut(tr("Ctrl+A"));
     connect(aboutProgramAct, SIGNAL(triggered()), this, SLOT(aboutProgram()));
 
+
+    defaultCursorAct = new QAction(QIcon::fromTheme("pointer"), tr("1"), this);
+    connect(defaultCursorAct, SIGNAL(triggered()), this, SLOT(setCursorDefault()));
+
+    moveMapCursorAct = new QAction(QIcon::fromTheme("transform-browse"), tr("2"), this);
+    connect(moveMapCursorAct, SIGNAL(triggered()), this, SLOT(setCursorMoveMap()));
+
+    moveObjectCursorAct = new QAction(QIcon::fromTheme("object-move"), tr("3"), this);
+    connect(moveObjectCursorAct, SIGNAL(triggered()), this, SLOT(setCursorMoveObject()));
+
+    polylineCursorAct = new QAction(QIcon::fromTheme("format-node-line"), tr("4"), this);
+    connect(polylineCursorAct, SIGNAL(triggered()), this, SLOT(setCursorPolyline()));
+
+    polygonCursorAct = new QAction(QIcon::fromTheme("itmages-stop"), tr("5"), this);
+    connect(polygonCursorAct, SIGNAL(triggered()), this, SLOT(setCursorPolygon()));
+
+    textCursorAct = new QAction(QIcon::fromTheme("edit-select-text"), tr("6"), this);
+    connect(textCursorAct, SIGNAL(triggered()), this, SLOT(setCursorText()));
+
+    bindingCursorAct = new QAction(QIcon::fromTheme("edit-paste-in-place"), tr("7"), this);
+    connect(bindingCursorAct, SIGNAL(triggered()), this, SLOT(setCursorBinding()));
+
+    updateActions();
 }
 
 void Viewer::createMenus()
@@ -148,12 +180,123 @@ void Viewer::createMenus()
     helpMenu->addAction(aboutProgramAct);
 
 
-
     menuBar()->addMenu(fileMenu);
     menuBar()->addMenu(editMenu);
     menuBar()->addMenu(tablesMenu);
     menuBar()->addMenu(windowMenu);
     menuBar()->addMenu(helpMenu);
+}
+
+void Viewer::createToolbar()
+{
+    toolbar->setMovable(true);
+    toolbar->setEnabled(true);
+    toolbar->addAction(defaultCursorAct);
+    toolbar->addAction(moveMapCursorAct);
+    toolbar->addAction(moveObjectCursorAct);
+    toolbar->addAction(polylineCursorAct);
+    toolbar->addAction(polygonCursorAct);
+    toolbar->addAction(textCursorAct);
+    toolbar->addAction(bindingCursorAct);
+    addToolBar(Qt::LeftToolBarArea, toolbar);
+}
+
+void Viewer::createLayerDock()
+{
+
+    QPushButton *addLayerBtn = new QPushButton();
+    addLayerBtn->setIcon(QIcon::fromTheme("list-add"));
+
+    QPushButton *addSublayerBtn = new QPushButton();
+    addSublayerBtn->setIcon(QIcon::fromTheme("view-financial-category-add"));
+
+    QPushButton *deleteLayerBtn = new QPushButton();
+    deleteLayerBtn->setIcon(QIcon::fromTheme("trash-empty"));
+
+    QPushButton *renameBtn = new QPushButton();
+    renameBtn->setIcon(QIcon::fromTheme("edit-select-text"));
+
+    QPushButton *moreBtn = new QPushButton();
+    moreBtn->setIcon(QIcon::fromTheme("view-more-horizontal"));
+
+    QHBoxLayout *layerTools = new QHBoxLayout();
+    layerTools->setAlignment(Qt::AlignRight);
+    layerTools->addWidget(addLayerBtn);
+    layerTools->addWidget(addSublayerBtn);
+    layerTools->addWidget(deleteLayerBtn);
+    layerTools->addWidget(renameBtn);
+    layerTools->addWidget(moreBtn);
+
+    QTreeWidgetItem *item = new QTreeWidgetItem(1);
+    item->setText(0, "Телебоба");
+
+    QTreeWidget *tree = new QTreeWidget();
+    tree->setColumnCount(2);
+    tree->addTopLevelItem(item);
+
+    QVBoxLayout *vbox = new QVBoxLayout();
+    vbox->addWidget(tree);
+    vbox->addLayout(layerTools);
+
+    QGroupBox *vboxGroup = new QGroupBox();
+    vboxGroup->setLayout(vbox);
+
+    dock->setMinimumWidth(200);
+    dock->setMinimumHeight(100);
+    dock->setWidget(vboxGroup);
+
+    addDockWidget(Qt::RightDockWidgetArea, dock);
+}
+
+void Viewer::updateActions()
+{
+    toolbar->setVisible(toolsAct->isChecked());
+    if (isProjectExist())
+    {
+        if (project_->isMapExist())
+        {
+            if(project_->getMap().isBinded())
+            {
+                defaultCursorAct->setVisible(true);
+                moveMapCursorAct->setVisible(true);
+                moveObjectCursorAct->setVisible(true);
+                polylineCursorAct->setVisible(true);
+                polygonCursorAct->setVisible(true);
+                textCursorAct->setVisible(true);
+                bindingCursorAct->setVisible(true);
+            }
+            else
+            {
+                defaultCursorAct->setVisible(true);
+                moveMapCursorAct->setVisible(true);
+                moveObjectCursorAct->setVisible(false);
+                polylineCursorAct->setVisible(false);
+                polygonCursorAct->setVisible(false);
+                textCursorAct->setVisible(false);
+                bindingCursorAct->setVisible(true);
+            }
+        }
+        else
+        {
+            defaultCursorAct->setVisible(true);
+            moveMapCursorAct->setVisible(true);
+            moveObjectCursorAct->setVisible(false);
+            polylineCursorAct->setVisible(false);
+            polygonCursorAct->setVisible(false);
+            textCursorAct->setVisible(false);
+            bindingCursorAct->setVisible(false);
+        }
+    }
+    else
+    {
+        defaultCursorAct->setVisible(true);
+        moveMapCursorAct->setVisible(false);
+        moveObjectCursorAct->setVisible(false);
+        polylineCursorAct->setVisible(false);
+        polygonCursorAct->setVisible(false);
+        textCursorAct->setVisible(false);
+        bindingCursorAct->setVisible(false);
+    }
 }
 
 void Viewer::repaint()
@@ -202,6 +345,7 @@ void Viewer::createProject()
                                   "<p>Выберите другую или очистите эту</p>");
         }
     }
+    updateActions();
     repaint();
 }
 
@@ -214,6 +358,7 @@ void Viewer::openProject()
     project_ = new Project(projectName);
     projectDirPath_ = projectDirPath;
     project_->open(projectDirPath_);
+    updateActions();
     repaint();
 }
 
@@ -262,6 +407,7 @@ void Viewer::selectMap()
                 this, tr("Выбрать карту"), QDir::currentPath(), tr("Image (*.jpg *.png *.gif)"));
     project_->setMap(mapPath);
 
+    updateActions();
     repaint();
 }
 
@@ -272,13 +418,13 @@ void Viewer::exit()
 
 void Viewer::zoomIn()
 {
-    scaleFactor_ *= 1.1;
+    scaleFactor_ *= 1.2;
     repaint();
 }
 
 void Viewer::zoomOut()
 {
-    scaleFactor_ /= 1.1;
+    scaleFactor_ /= 1.2;
     repaint();
 }
 
@@ -317,12 +463,12 @@ void Viewer::request()
 
 void Viewer::layers()
 {
-
+    updateActions();
 }
 
 void Viewer::tools()
 {
-
+    updateActions();
 }
 
 void Viewer::aboutProgram()
@@ -333,42 +479,107 @@ void Viewer::aboutProgram()
 
 void Viewer::mousePressEvent(QMouseEvent *event)
 {
-    switch (event->button()) {
-//        case Qt::LeftButton:
-//        {
-//        QMessageBox::warning(this, "Имя проекта не введено",
-//                             "<b>Имя проекта не введено</b>");
-//            break;
-//        }
-//        case Qt::RightButton:
-//        {
-//        QMessageBox::warning(this, "Имя проекта не введено",
-//                             "<b>Имя проекта не введено</b>");
-//            break;
-//        }
-        case Qt::MiddleButton:
+    if (this->isProjectExist())
+    {
+        if (project_->isMapExist())
         {
-            break;
-        }
-        default:
-        {
-            break;
+            switch (event->button())
+            {
+                case Qt::LeftButton:
+                {
+        //            switch (control)
+        //            {
+        //            case value:
+
+        //                break;
+        //            default:
+        //                break;
+        //            }
+                    qint64 a = scrollArea->horizontalScrollBar()->value();
+                    a = imageLabel->pos().x();
+                    imageLabel->pos().setX(111);
+                    QMessageBox::about(this, tr("О MapDesigner"),
+                                       QString::number(cursorType_));
+                    break;
+                }
+                case Qt::MiddleButton:
+                {
+
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+
+            repaint();
         }
     }
-
-    repaint();
 }
 
 void Viewer::wheelEvent(QWheelEvent *event)
 {
-    QPoint numDegrees = event->angleDelta() / 8;
+    if (this->isProjectExist())
+    {
+        if (project_->isMapExist())
+        {
+            QPoint numDegrees = event->angleDelta() / 8;
 
-    if (numDegrees.y() > 0)
-    {
-        zoomIn();
+            if (numDegrees.y() > 0)
+            {
+                zoomIn();
+            }
+            else
+            {
+                zoomOut();
+            }
+        }
     }
-    else
-    {
-        zoomOut();
-    }
+}
+
+
+void Viewer::setCursorType(CursorType type)
+{
+    cursorType_ = type;
+}
+
+void Viewer::setCursorDefault()
+{
+    setCursorType(CursorType::DEFAULT);
+}
+
+void Viewer::setCursorMoveMap()
+{
+    setCursorType(CursorType::MOVE_MAP);
+}
+
+void Viewer::setCursorMoveObject()
+{
+    setCursorType(CursorType::MOVE_OBJECT);
+}
+
+void Viewer::setCursorPolyline()
+{
+    setCursorType(CursorType::POLYLINE);
+}
+
+void Viewer::setCursorPolygon()
+{
+    setCursorType(CursorType::POLYGON);
+}
+
+void Viewer::setCursorText()
+{
+    setCursorType(CursorType::TEXT);
+}
+
+void Viewer::setCursorBinding()
+{
+    setCursorType(CursorType::BINDING);
+}
+
+bool Viewer::isProjectExist()
+{
+    return project_ != nullptr;
 }

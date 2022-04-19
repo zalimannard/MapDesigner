@@ -8,8 +8,21 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QGraphicsSceneWheelEvent>
+#include <QToolBar>
+#include <QDockWidget>
 #include "project.h"
 #include "myscrollarea.h"
+
+enum CursorType
+{
+    DEFAULT,
+    MOVE_MAP,
+    MOVE_OBJECT,
+    POLYLINE,
+    POLYGON,
+    TEXT,
+    BINDING
+};
 
 class Viewer : public QMainWindow
 {
@@ -22,13 +35,17 @@ public:
 private:
     Project *project_ = nullptr;
     QString projectDirPath_ = "";
+    CursorType cursorType_ = CursorType::TEXT;
 
     void createActions();
     void createMenus();
+    void createToolbar();
+    void createLayerDock();
     void updateActions();
     void scaleImage(double factor);
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
     void repaint();
+    bool isProjectExist();
 
     QLabel *imageLabel;
     MyScrollArea *scrollArea;
@@ -63,6 +80,17 @@ private:
     QMenu *windowMenu;
     QMenu *helpMenu;
 
+    QAction *defaultCursorAct;
+    QAction *moveMapCursorAct;
+    QAction *moveObjectCursorAct;
+    QAction *polylineCursorAct;
+    QAction *polygonCursorAct;
+    QAction *textCursorAct;
+    QAction *bindingCursorAct;
+
+    QToolBar *toolbar = new QToolBar("Инструменты", this);
+    QDockWidget *dock = new QDockWidget("Слои", this);
+
 private slots:
 
     void mousePressEvent(QMouseEvent *event);
@@ -89,5 +117,15 @@ private slots:
     void tools();
 
     void aboutProgram();
+
+
+    void setCursorType(CursorType type);
+    void setCursorDefault();
+    void setCursorMoveMap();
+    void setCursorMoveObject();
+    void setCursorBinding();
+    void setCursorPolyline();
+    void setCursorPolygon();
+    void setCursorText();
 };
 #endif // VIEWER_H

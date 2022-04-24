@@ -2,19 +2,25 @@
 #define POLYGON_H
 
 #include <QVector>
+
+#include "layeritem.h"
 #include "point.h"
 
-class Polygon
+class Polygon : public LayerItem
 {
 public:
-    Polygon(const Point &start);
+    Polygon(const Point &firstPoint, const QString &name = "Многоугольник", const QString &description = "");
 
-    QVector<Point> points;
+    qreal perimeter(const Map &map) const override;
+    qreal square(const Map &map) const override;
+    QStringList report(const Map &map) const override;
 
-    qreal calculatePerimeter() const;
-    qreal calculateArea() const;
+    void draw(QPixmap &pixmap) const override;
+
+    LayerItem* clone() const override;
 
 private:
+    QVector<Point> points;
 };
 
 #endif // POLYGON_H

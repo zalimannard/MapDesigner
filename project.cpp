@@ -15,21 +15,17 @@ Project::Project(const QString &name)
     }
 }
 
-void Project::save(const QString &path) const
+void Project::save() const
 {
     QFile file;
-    file.setFileName(path + "/" + name_ + ".mdp");
-    qDebug() << file.fileName();
+    file.setFileName(path_ + "/" + name_ + ".mdp");
     if (file.open(QIODevice::ReadWrite)) {
         QTextStream writeStream(&file);
-        qDebug() << "C";
         if (isMapExist())
         {
-            qDebug() << "Map Exist";
             writeStream << "$map" << Qt::endl;
-            writeStream << getMap().getPathToImage() << Qt::endl;
+            writeStream << map_->getPathToImage() << Qt::endl;
             writeStream.flush();
-            qDebug() << "S";
         }
     }
     file.close();
@@ -51,11 +47,56 @@ void Project::open(const QString &path)
         if (line == "$map")
         {
             QString mapPath = in.readLine();
-            this->setMap(mapPath);
+            setMap(mapPath);
         }
     }
     file.close();
-    //TODO
+}
+
+void Project::draw(QPixmap &pixmap) const
+{
+    if (isMapExist())
+    {
+        map_->draw(pixmap);
+    }
+    for(auto i = layers_.size(); i > 0; --i)
+    {
+        layers_.at(i).draw(pixmap);
+    }
+}
+
+void Project::pushLayer(const Layer &layer)
+{
+    layers_.append(layer);
+}
+
+Layer Project::layerAt(const qint64 &index)
+{
+    return layers_.at(index);
+}
+
+void Project::removeLayer(const qint64 &index)
+{
+    layers_.remove(index);
+}
+
+void Project::moveUpLayer(const qint64 &index)
+{
+    Layer movedLayer = layers_.at(index);
+    layers_.remove(index);
+    layers_.insert(qMax((qint64) 0, index - 1), movedLayer);
+}
+
+void Project::moveDownLayer(const qint64 &index)
+{
+    Layer movedLayer = layers_.at(index);
+    layers_.remove(index);
+    layers_.insert(qMin((qint64) layers_.size(), index + 1), movedLayer);
+}
+
+QString Project::getMap() const
+{
+    return map_->getPathToImage();
 }
 
 void Project::setMap(const QString &path)
@@ -63,17 +104,28 @@ void Project::setMap(const QString &path)
     map_ = new Map(path);
 }
 
-Map Project::getMap() const
-{
-    return *map_;
-}
 
 bool Project::isMapExist() const
 {
     return map_ != nullptr;
 }
 
+void Project::setName(const QString &name)
+{
+    this->name_ = name;
+}
+
 QString Project::getName() const
 {
     return name_;
+}
+
+void Project::setPath(const QString &path)
+{
+    this->path_ = path;
+}
+
+QString Project::getPath() const
+{
+    return path_;
 }

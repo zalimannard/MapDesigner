@@ -1,22 +1,24 @@
-#ifndef TEXT_H
-#define TEXT_H
+//#ifndef TEXT_H
+//#define TEXT_H
 
-#include <QFont>
-#include <QString>
+//#include <QFont>
+//#include <QString>
 
-class Text
-{
-public:
-    Text();
+//#include "layeritem.h"
 
-    QFont font;
-    QString content_;
+//class Text : public LayerItem
+//{
+//public:
+//    Text();
 
-    QString getColor() const;
-    void setColor(QString newColor);
+//    QFont font;
+//    QString content_;
 
-private:
-    QString color_;
-};
+//    QString getColor() const;
+//    void setColor(QString newColor);
 
-#endif // TEXT_H
+//private:
+//    QString color_;
+//};
+
+//#endif // TEXT_H

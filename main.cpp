@@ -1,6 +1,6 @@
-#include "viewer.h"
-
 #include <QApplication>
+
+#include "viewer.h"
 
 int main(int argc, char *argv[])
 {

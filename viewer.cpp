@@ -7,8 +7,6 @@
 #include <QWheelEvent>
 #include <QDebug>
 #include <QDrag>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -206,33 +204,35 @@ void Viewer::createLayerDock()
 
     QPushButton *addLayerBtn = new QPushButton();
     addLayerBtn->setIcon(QIcon::fromTheme("list-add"));
-
-    QPushButton *addSublayerBtn = new QPushButton();
-    addSublayerBtn->setIcon(QIcon::fromTheme("view-financial-category-add"));
+    connect(addLayerBtn, SIGNAL (released()),this, SLOT (addLayer()));
 
     QPushButton *deleteLayerBtn = new QPushButton();
     deleteLayerBtn->setIcon(QIcon::fromTheme("trash-empty"));
+    connect(deleteLayerBtn, SIGNAL (released()),this, SLOT (deleteLayer()));
+
+    QPushButton *toggleVisibleBtn = new QPushButton();
+    toggleVisibleBtn->setIcon(QIcon::fromTheme("visibility"));
+    connect(toggleVisibleBtn, SIGNAL (released()),this, SLOT (toggleVisibleLayer()));
 
     QPushButton *renameBtn = new QPushButton();
     renameBtn->setIcon(QIcon::fromTheme("edit-select-text"));
+    connect(renameBtn, SIGNAL (released()),this, SLOT (renameLayer()));
 
     QPushButton *moreBtn = new QPushButton();
     moreBtn->setIcon(QIcon::fromTheme("view-more-horizontal"));
+    connect(moreBtn, SIGNAL (released()),this, SLOT (moreLayer()));
 
     QHBoxLayout *layerTools = new QHBoxLayout();
     layerTools->setAlignment(Qt::AlignRight);
     layerTools->addWidget(addLayerBtn);
-    layerTools->addWidget(addSublayerBtn);
     layerTools->addWidget(deleteLayerBtn);
+    layerTools->addWidget(toggleVisibleBtn);
     layerTools->addWidget(renameBtn);
     layerTools->addWidget(moreBtn);
 
-    QTreeWidgetItem *item = new QTreeWidgetItem(1);
-    item->setText(0, "Телебоба");
-
-    QTreeWidget *tree = new QTreeWidget();
     tree->setColumnCount(2);
-    tree->addTopLevelItem(item);
+    tree->setColumnWidth(0, 160);
+    tree->setHeaderLabels(QStringList() << "Название" << "");
 
     QVBoxLayout *vbox = new QVBoxLayout();
     vbox->addWidget(tree);
@@ -241,7 +241,7 @@ void Viewer::createLayerDock()
     QGroupBox *vboxGroup = new QGroupBox();
     vboxGroup->setLayout(vbox);
 
-    dock->setMinimumWidth(200);
+    dock->setMinimumWidth(280);
     dock->setMinimumHeight(100);
     dock->setWidget(vboxGroup);
 
@@ -251,12 +251,13 @@ void Viewer::createLayerDock()
 void Viewer::updateActions()
 {
     toolbar->setVisible(toolsAct->isChecked());
+    dock->setVisible(layersAct->isChecked());
     if (isProjectExist())
     {
         if (project_->isMapExist())
         {
-            if(project_->getMap().isBinded())
-            {
+//            if(project_->getMap().isBinded())
+//            {
                 defaultCursorAct->setVisible(true);
                 moveMapCursorAct->setVisible(true);
                 moveObjectCursorAct->setVisible(true);
@@ -264,17 +265,17 @@ void Viewer::updateActions()
                 polygonCursorAct->setVisible(true);
                 textCursorAct->setVisible(true);
                 bindingCursorAct->setVisible(true);
-            }
-            else
-            {
-                defaultCursorAct->setVisible(true);
-                moveMapCursorAct->setVisible(true);
-                moveObjectCursorAct->setVisible(false);
-                polylineCursorAct->setVisible(false);
-                polygonCursorAct->setVisible(false);
-                textCursorAct->setVisible(false);
-                bindingCursorAct->setVisible(true);
-            }
+//            }
+//            else
+//            {
+//                defaultCursorAct->setVisible(true);
+//                moveMapCursorAct->setVisible(true);
+//                moveObjectCursorAct->setVisible(false);
+//                polylineCursorAct->setVisible(false);
+//                polygonCursorAct->setVisible(false);
+//                textCursorAct->setVisible(false);
+//                bindingCursorAct->setVisible(true);
+//            }
         }
         else
         {
@@ -299,19 +300,39 @@ void Viewer::updateActions()
     }
 }
 
+void Viewer::updateToolbar()
+{
+
+}
+
+void Viewer::updateLayerDock()
+{
+
+}
+
 void Viewer::repaint()
 {
-    if (project_ != nullptr)
+    if (isProjectExist())
     {
-        if (project_->isMapExist())
+        if (getProject()->isMapExist())
         {
-            QImage image(project_->getMap().getPathToImage());
-            QPixmap pixmap(QPixmap::fromImage(image));
+            QPixmap pixmap;
+            getProject()->draw(pixmap);
 
             imageLabel->setPixmap(pixmap);
-            imageLabel->resize(image.width() * scaleFactor_, image.height() * scaleFactor_);
+            imageLabel->resize(pixmap.width() * scaleFactor_, pixmap.height() * scaleFactor_);
         }
     }
+}
+
+bool Viewer::isProjectExist()
+{
+    return project_ != nullptr;
+}
+
+Project* Viewer::getProject()
+{
+    return project_;
 }
 
 void Viewer::createProject()
@@ -329,8 +350,8 @@ void Viewer::createProject()
             if (!projectName.isEmpty())
             {
                 project_ = new Project(projectName);
-                projectDirPath_ = projectDirPath;
-                project_->save(projectDirPath_);
+                getProject()->setPath(projectDirPath);
+                getProject()->save();
             }
             else
             {
@@ -346,6 +367,8 @@ void Viewer::createProject()
         }
     }
     updateActions();
+    updateToolbar();
+    updateLayerDock();
     repaint();
 }
 
@@ -356,16 +379,16 @@ void Viewer::openProject()
     QString projectName = projectFilePath.split("/").last().split(".").first();
     QString projectDirPath = projectFilePath.remove(projectFilePath.lastIndexOf("/"), projectFilePath.split("/").last().length() + 1);
     project_ = new Project(projectName);
-    projectDirPath_ = projectDirPath;
-    project_->open(projectDirPath_);
+    project_->open(projectDirPath);
     updateActions();
+    updateToolbar();
+    updateLayerDock();
     repaint();
 }
 
 void Viewer::saveProject()
 {
-    project_->save(projectDirPath_);
-    repaint();
+    getProject()->save();
 }
 
 void Viewer::saveProjectAs()
@@ -382,8 +405,9 @@ void Viewer::saveProjectAs()
                                   QLineEdit::Normal);
             if (!projectName.isEmpty())
             {
-                projectDirPath_ = projectDirPath;
-                project_->save(projectDirPath_);
+                getProject()->setName(projectName);
+                getProject()->setPath(projectDirPath);
+                getProject()->save();
             }
             else
             {
@@ -398,7 +422,6 @@ void Viewer::saveProjectAs()
                                   "<p>Выберите другую или очистите эту</p>");
         }
     }
-    repaint();
 }
 
 void Viewer::selectMap()
@@ -436,7 +459,7 @@ void Viewer::normalSize()
 
 void Viewer::fitSize()
 {
-    QImage image(project_->getMap().getPathToImage());
+    QImage image(getProject()->getMap());
     scaleFactor_ = qMin((qreal)scrollArea->height() / image.height(), (qreal)scrollArea->width() / image.width());
     repaint();
 }
@@ -487,24 +510,34 @@ void Viewer::mousePressEvent(QMouseEvent *event)
             {
                 case Qt::LeftButton:
                 {
-        //            switch (control)
-        //            {
-        //            case value:
-
-        //                break;
-        //            default:
-        //                break;
-        //            }
+                    switch (cursorType_)
+                    {
+                    case CursorType::DEFAULT:
+                        break;
+                    case CursorType::MOVE_MAP:
+                        break;
+                    case CursorType::MOVE_OBJECT:
+                        break;
+                    case CursorType::POLYLINE:
+                        break;
+                    case CursorType::POLYGON:
+                        break;
+                    case CursorType::TEXT:
+                        break;
+                    case CursorType::BINDING:
+                        break;
+                    default:
+                        break;
+                    }
                     qint64 a = scrollArea->horizontalScrollBar()->value();
                     a = imageLabel->pos().x();
                     imageLabel->pos().setX(111);
-                    QMessageBox::about(this, tr("О MapDesigner"),
-                                       QString::number(cursorType_));
+//                    QMessageBox::about(this, tr("О MapDesigner"),
+//                                       QString::number(cursorType_));
                     break;
                 }
                 case Qt::MiddleButton:
                 {
-
                     break;
                 }
                 default:
@@ -516,6 +549,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
             repaint();
         }
     }
+}
+
+void Viewer::mouseDoubleClickEvent(QMouseEvent *event)
+{
+
 }
 
 void Viewer::wheelEvent(QWheelEvent *event)
@@ -544,42 +582,96 @@ void Viewer::setCursorType(CursorType type)
     cursorType_ = type;
 }
 
-void Viewer::setCursorDefault()
+void Viewer::addLayer()
 {
-    setCursorType(CursorType::DEFAULT);
+    Layer newLayer("Без названия");
+    getProject()->pushLayer(newLayer);
+
+    QTreeWidgetItem *item = new QTreeWidgetItem(1);
+    QTreeWidgetItem *item2 = new QTreeWidgetItem(1);
+    item2->setText(0, "aoeu");
+    QTreeWidgetItem *item3 = new QTreeWidgetItem(1);
+    item3->setText(0, "snth");
+    item->setText(0, "Телебоба" + QString::number(tree->topLevelItemCount()));
+    item->addChild(item2);
+    item->addChild(item3);
+    tree->addTopLevelItem(item);
+
 }
 
-void Viewer::setCursorMoveMap()
+void Viewer::deleteLayer()
 {
-    setCursorType(CursorType::MOVE_MAP);
+    if (tree->currentIndex().parent().row() == -1)
+    {
+        getProject()->removeLayer(tree->currentIndex().row());
+        delete tree->takeTopLevelItem(tree->currentIndex().row());
+    }
+    else
+    {
+//        project_->layers.at(tree->currentIndex().parent().row())->object.remove(tree->currentIndex().row());
+        tree->currentItem()->parent()->removeChild(tree->currentItem());
+    }
 }
 
-void Viewer::setCursorMoveObject()
+void Viewer::toggleVisibleLayer()
 {
-    setCursorType(CursorType::MOVE_OBJECT);
+    if (tree->currentIndex().parent().row() == -1)
+    {
+        qint64 currentTopLevelIndex = tree->currentIndex().row();
+        bool currentVisible = getProject()->layerAt(currentTopLevelIndex).isVisible();
+        getProject()->layerAt(currentTopLevelIndex).setVisible(!currentVisible);
+        currentVisible = !currentVisible;
+        if (currentVisible)
+        {
+            tree->topLevelItem(currentTopLevelIndex)->setText(1, "");
+        }
+        else
+        {
+            tree->topLevelItem(currentTopLevelIndex)->setText(1, "Скрыт");
+        }
+    }
+    else
+    {
+        qint64 currentTopLevelIndex = tree->currentIndex().parent().row();
+        qint64 currentSecondLevelIndex = tree->currentIndex().row();
+//        bool currentVisible = project_->layers.at(currentTopLevelIndex)->object.at(currentSecondLevelIndex).isVisible();
+////        project_->layers.at(currentTopLevelIndex)->object.at(currentSecondLevelIndex).setVisible(!currentVisible);
+//        currentVisible = !currentVisible;
+
+//        if (currentVisible)
+//        {
+//            tree->topLevelItem(currentTopLevelIndex)->takeChild(currentSecondLevelIndex)->setText(1, "");
+//        }
+//        else
+//        {
+//            tree->topLevelItem(currentTopLevelIndex)->takeChild(currentSecondLevelIndex)->setText(1, "Скрыт");
+//        }
+    }
 }
 
-void Viewer::setCursorPolyline()
+void Viewer::renameLayer()
 {
-    setCursorType(CursorType::POLYLINE);
+    QString newName = QInputDialog::getText(this,
+                                 QString::fromUtf8("Введите название"),
+                                 QString::fromUtf8("Новое название:"),
+                                 QLineEdit::Normal);
+    if (tree->currentIndex().parent().row() == -1)
+    {
+        qint64 currentTopLevelIndex = tree->currentIndex().row();
+        bool currentVisible = getProject()->layerAt(currentTopLevelIndex).isVisible();
+        getProject()->layerAt(currentTopLevelIndex).setName(newName);
+        tree->topLevelItem(currentTopLevelIndex)->setText(0, newName);
+    }
+    else
+    {
+        qint64 currentTopLevelIndex = tree->currentIndex().parent().row();
+        qint64 currentSecondLevelIndex = tree->currentIndex().row();
+//        bool currentVisible = project_->layers.at(currentTopLevelIndex)->object.at(currentSecondLevelIndex).isVisible();
+//        project_->layers.at(currentTopLevelIndex)->object.at(currentSecondLevelIndex).setVisible(!currentVisible);
+    }
 }
 
-void Viewer::setCursorPolygon()
+void Viewer::moreLayer()
 {
-    setCursorType(CursorType::POLYGON);
-}
 
-void Viewer::setCursorText()
-{
-    setCursorType(CursorType::TEXT);
-}
-
-void Viewer::setCursorBinding()
-{
-    setCursorType(CursorType::BINDING);
-}
-
-bool Viewer::isProjectExist()
-{
-    return project_ != nullptr;
 }

@@ -10,6 +10,9 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QToolBar>
 #include <QDockWidget>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+
 #include "project.h"
 #include "myscrollarea.h"
 
@@ -34,18 +37,26 @@ public:
 
 private:
     Project *project_ = nullptr;
-    QString projectDirPath_ = "";
-    CursorType cursorType_ = CursorType::TEXT;
+    CursorType cursorType_ = CursorType::DEFAULT;
 
     void createActions();
     void createMenus();
     void createToolbar();
     void createLayerDock();
     void updateActions();
-    void scaleImage(double factor);
-    void adjustScrollBar(QScrollBar *scrollBar, double factor);
+    void updateToolbar();
+    void updateLayerDock();
+
+    void scaleImage(qreal factor);
+    void adjustScrollBar(QScrollBar *scrollBar, qreal factor);
+    QToolBar *toolbar = new QToolBar("Инструменты", this);
+    QDockWidget *dock = new QDockWidget("Слои", this);
+    QTreeWidget *tree = new QTreeWidget();
+
     void repaint();
     bool isProjectExist();
+
+    Project* getProject();
 
     QLabel *imageLabel;
     MyScrollArea *scrollArea;
@@ -88,12 +99,9 @@ private:
     QAction *textCursorAct;
     QAction *bindingCursorAct;
 
-    QToolBar *toolbar = new QToolBar("Инструменты", this);
-    QDockWidget *dock = new QDockWidget("Слои", this);
-
 private slots:
-
     void mousePressEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
 
     void createProject();
@@ -120,12 +128,12 @@ private slots:
 
 
     void setCursorType(CursorType type);
-    void setCursorDefault();
-    void setCursorMoveMap();
-    void setCursorMoveObject();
-    void setCursorBinding();
-    void setCursorPolyline();
-    void setCursorPolygon();
-    void setCursorText();
+
+
+    void addLayer();
+    void deleteLayer();
+    void toggleVisibleLayer();
+    void renameLayer();
+    void moreLayer();
 };
 #endif // VIEWER_H

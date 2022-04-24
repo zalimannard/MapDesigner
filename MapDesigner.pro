@@ -9,9 +9,10 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    displayedobject.cpp \
+    drawableobject.cpp \
+    imageobject.cpp \
     layer.cpp \
-    line.cpp \
+    layeritem.cpp \
     main.cpp \
     map.cpp \
     myscrollarea.cpp \
@@ -23,9 +24,10 @@ SOURCES += \
     viewer.cpp
 
 HEADERS += \
-    displayedobject.h \
+    drawableobject.h \
+    imageobject.h \
     layer.h \
-    line.h \
+    layeritem.h \
     map.h \
     myscrollarea.h \
     point.h \

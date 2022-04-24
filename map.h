@@ -1,26 +1,26 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include <QString>
-#include <QVector>
+#include <QQueue>
 #include <QPair>
+
+#include "imageobject.h"
 #include "point.h"
 
-#include "displayedobject.h"
-
-class Map : public DisplayedObject
+class Map : public ImageObject
 {
 public:
-    Map(QString pathToImage);
-    QString getPathToImage();
-    void setMainPoint(Point imagePoint, Point mapPoint);
-    bool isBinded();
+    Map(const QString &pathToImage);
+    QString getPathToImage() const;
+
+    void addPoint(const Point &imagePoint, const Point &earthPoint);
+    Point imagePointToEarthPoint(const Point &imagePoint) const;
+    qreal distance(const Point &first, const Point &second) const;
+
+    void draw(QPixmap &pixmap) const override;
 
 private:
-    Point *mainPointImage_;
-    Point *mainPointMap_;
-    qreal latitudePerPixel_ = 0.0;
-    qreal longitudePerPixel_ = 0.0;
+    QQueue<QPair<Point, Point> > points_; // .first - imagePoint, .second - earthPoint
     QString pathToImage_;
 };
 

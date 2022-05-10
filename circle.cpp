@@ -57,7 +57,6 @@ bool Circle::isHealthy() const
 
 void Circle::draw(QPixmap &pixmap) const
 {
-    // Заливка
     QPainter *painter = new QPainter(&pixmap);
     QPen pen;
     pen.setColor(getStyle().getLineColor());

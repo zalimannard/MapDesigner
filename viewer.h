@@ -16,6 +16,7 @@
 #include "project.h"
 #include "myscrollarea.h"
 #include "polyline.h"
+#include "layerdock.h"
 
 enum CursorType
 {
@@ -57,16 +58,10 @@ private:
     void scaleImage(qreal factor);
     void adjustScrollBar(QScrollBar *scrollBar, qreal factor);
     QToolBar *toolbar = new QToolBar("Инструменты", this);
-    QDockWidget *dock = new QDockWidget("Слои", this);
-    QTreeWidget *tree = new QTreeWidget();
+    LayerDock *layerDock;
 
     Point getMousePointOnImage(QMouseEvent *event);
     void repaint();
-    bool isProjectExist();
-    bool isAnySelected();
-    bool isLayerSelected();
-    bool isObjectSelected();
-    qint64 getCurrentTopLevelIndex();
 
     Project* getProject();
 
@@ -115,6 +110,8 @@ private:
     QAction *bindingCursorAct;
     QAction *earthPointAct;
 
+    bool isProjectExist();
+
 private slots:
     void mousePressEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -155,14 +152,5 @@ private slots:
     void setCursorInfection();
     void setCursorBinding();
     void setCursorEarthPoint();
-
-
-    void addLayer();
-    void deleteLayer();
-    void toggleVisibleLayer();
-    void renameLayer();
-    void moreLayer();
-    void moveUp();
-    void moveDown();
 };
 #endif // VIEWER_H

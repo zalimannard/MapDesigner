@@ -32,7 +32,6 @@ Viewer::Viewer(QWidget *parent)
     createActions();
     createMenus();
     createToolbar();
-    createLayerDock();
 
     setWindowTitle(tr("Map Designer"));
     resize(1280, 720);
@@ -219,63 +218,9 @@ void Viewer::createToolbar()
 
 void Viewer::createLayerDock()
 {
-
-    QPushButton *addLayerBtn = new QPushButton();
-    addLayerBtn->setIcon(QIcon::fromTheme("list-add"));
-    connect(addLayerBtn, SIGNAL (released()),this, SLOT (addLayer()));
-
-    QPushButton *deleteLayerBtn = new QPushButton();
-    deleteLayerBtn->setIcon(QIcon::fromTheme("trash-empty"));
-    connect(deleteLayerBtn, SIGNAL (released()),this, SLOT (deleteLayer()));
-
-    QPushButton *toggleVisibleBtn = new QPushButton();
-    toggleVisibleBtn->setIcon(QIcon::fromTheme("visibility"));
-    connect(toggleVisibleBtn, SIGNAL (released()),this, SLOT (toggleVisibleLayer()));
-
-    QPushButton *renameBtn = new QPushButton();
-    renameBtn->setIcon(QIcon::fromTheme("edit-select-text"));
-    connect(renameBtn, SIGNAL (released()),this, SLOT (renameLayer()));
-
-    QPushButton *moreBtn = new QPushButton();
-    moreBtn->setIcon(QIcon::fromTheme("view-more-horizontal"));
-    connect(moreBtn, SIGNAL (released()),this, SLOT (moreLayer()));
-
-    QPushButton *moveUpBtn = new QPushButton();
-    moveUpBtn->setIcon(QIcon::fromTheme("go-up"));
-    connect(moveUpBtn, SIGNAL (released()),this, SLOT (moveUp()));
-
-    QPushButton *moveDownBtn = new QPushButton();
-    moveDownBtn->setIcon(QIcon::fromTheme("go-down"));
-    connect(moveDownBtn, SIGNAL (released()),this, SLOT (moveDown()));
-
-
-    QHBoxLayout *layerTools = new QHBoxLayout();
-    layerTools->setAlignment(Qt::AlignRight);
-    layerTools->addWidget(addLayerBtn);
-    layerTools->addWidget(deleteLayerBtn);
-    layerTools->addWidget(toggleVisibleBtn);
-    layerTools->addWidget(renameBtn);
-    layerTools->addWidget(moreBtn);
-    layerTools->addWidget(moveUpBtn);
-    layerTools->addWidget(moveDownBtn);
-
-    tree->setColumnCount(2);
-    tree->setColumnWidth(0, 160);
-    tree->setHeaderLabels(QStringList() << "Название" << "");
-
-    QVBoxLayout *vbox = new QVBoxLayout();
-    vbox->addWidget(tree);
-    vbox->addLayout(layerTools);
-
-    QGroupBox *vboxGroup = new QGroupBox();
-    vboxGroup->setLayout(vbox);
-
-    dock->setMinimumWidth(280);
-    dock->setMinimumHeight(100);
-    dock->setWidget(vboxGroup);
-
-    addDockWidget(Qt::RightDockWidgetArea, dock);
-    dock->setVisible(false);
+    layerDock = new LayerDock(project_);
+    addDockWidget(Qt::RightDockWidgetArea, layerDock);
+    layerDock->setVisible(true);
 }
 
 void Viewer::updateActions()
@@ -332,57 +277,6 @@ void Viewer::updateToolbar()
     toolbar->setVisible(toolsAct->isChecked());
 }
 
-void Viewer::updateLayerDock()
-{
-    if (isProjectExist())
-    {
-        if (getProject()->isMapExist())
-        {
-            dock->setVisible(layersAct->isChecked());
-        }
-        else
-        {
-            dock->setVisible(false);
-        }
-    }
-    else
-    {
-        dock->setVisible(false);
-    }
-
-    tree->clear();
-    for (int i = 0; i < getProject()->layerSize(); ++i)
-    {
-        QTreeWidgetItem *item = new QTreeWidgetItem(1);
-        item->setText(0, getProject()->layerAt(i)->getName());
-
-        if (getProject()->layerAt(i)->isVisible())
-        {
-            item->setText(1, "");
-        }
-        else
-        {
-            item->setText(1, "Скрыт");
-        }
-        for (int j = 0; j < getProject()->layerAt(i)->size(); ++j)
-        {
-            QTreeWidgetItem *subItem = new QTreeWidgetItem(1);
-            subItem->setText(0, getProject()->layerAt(i)->at(j)->getName());
-            if (getProject()->layerAt(i)->at(j)->isVisible())
-            {
-                subItem->setText(1, "");
-            }
-            else
-            {
-                subItem->setText(1, "Скрыт");
-            }
-            item->addChild(subItem);
-        }
-        tree->addTopLevelItem(item);
-        tree->expandAll();
-    }
-}
-
 void Viewer::repaint()
 {
     if (isProjectExist())
@@ -395,42 +289,6 @@ void Viewer::repaint()
             imageLabel->setPixmap(pixmap);
             imageLabel->resize(pixmap.width() * scaleFactor_, pixmap.height() * scaleFactor_);
         }
-    }
-}
-
-bool Viewer::isProjectExist()
-{
-    return project_ != nullptr;
-}
-
-bool Viewer::isAnySelected()
-{
-    return tree->currentIndex().row() != -1;
-}
-
-bool Viewer::isLayerSelected()
-{
-    return ((isAnySelected()) && (tree->currentIndex().parent().row() == -1));
-}
-
-bool Viewer::isObjectSelected()
-{
-    return ((isAnySelected()) && (!isLayerSelected()));
-}
-
-qint64 Viewer::getCurrentTopLevelIndex()
-{
-    if (isLayerSelected())
-    {
-        return tree->currentIndex().row();
-    }
-    else if (isObjectSelected())
-    {
-        return tree->currentIndex().parent().row();
-    }
-    else
-    {
-        return -1;
     }
 }
 
@@ -472,7 +330,6 @@ void Viewer::createProject()
     }
     updateActions();
     updateToolbar();
-    updateLayerDock();
     repaint();
 }
 
@@ -486,8 +343,11 @@ void Viewer::openProject()
     project_->open(projectDirPath);
     updateActions();
     updateToolbar();
-    updateLayerDock();
     repaint();
+    if (project_->isMapExist())
+    {
+        createLayerDock();
+    }
 }
 
 void Viewer::saveProject()
@@ -536,6 +396,7 @@ void Viewer::selectMap()
                     this, tr("Выбрать карту"), QDir::currentPath(), tr("Image (*.jpg *.png *.gif)"));
         project_->setMap(mapPath);
 
+        createLayerDock();
         updateActions();
         repaint();
     }
@@ -624,7 +485,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
             {
                 case Qt::LeftButton:
                 {
-                    qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
+                    qint64 currentTopLevelIndex = layerDock->getCurrentTopLevelIndex();
 
                     switch (cursorType_)
                     {
@@ -636,7 +497,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                         break;
                     case CursorType::POLYLINE:
                     {
-                        if (isAnySelected())
+                        if (layerDock->isAnySelected())
                         {
                             if (drawingMode_)
                             {
@@ -662,7 +523,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                     }
                     case CursorType::POLYGON:
                     {
-                        if (isAnySelected())
+                        if (layerDock->isAnySelected())
                         {
                             if (drawingMode_)
                             {
@@ -723,7 +584,6 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                     break;
                 }
             }
-            updateLayerDock();
             repaint();
         }
     }
@@ -816,102 +676,7 @@ void Viewer::setCursorEarthPoint()
     setCursorType(CursorType::EARTH_POINT);
 }
 
-void Viewer::addLayer()
+bool Viewer::isProjectExist()
 {
-    Layer* newLayer = new Layer();
-    getProject()->pushLayer(newLayer);
-    updateLayerDock();
-    repaint();
-}
-
-void Viewer::deleteLayer()
-{
-    if (tree->currentIndex().parent().row() == -1)
-    {
-        getProject()->removeLayer(tree->currentIndex().row());
-    }
-    else
-    {
-        getProject()->layerAt(tree->currentIndex().parent().row())->remove(tree->currentIndex().row());
-    }
-    updateLayerDock();
-    repaint();
-}
-
-void Viewer::toggleVisibleLayer()
-{
-    if (tree->currentIndex().parent().row() == -1)
-    {
-        qint64 currentTopLevelIndex = tree->currentIndex().row();
-        bool currentVisible = getProject()->layerAt(currentTopLevelIndex)->isVisible();
-        getProject()->layerAt(currentTopLevelIndex)->setVisible(!currentVisible);
-    }
-    else
-    {
-        qint64 currentTopLevelIndex = tree->currentIndex().parent().row();
-        qint64 currentSecondLevelIndex = tree->currentIndex().row();
-        bool currentVisible = getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->isVisible();
-        getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setVisible(!currentVisible);
-    }
-    updateLayerDock();
-    repaint();
-}
-
-void Viewer::renameLayer()
-{
-    QString newName = QInputDialog::getText(this,
-                                 QString::fromUtf8("Введите название"),
-                                 QString::fromUtf8("Новое название:"),
-                                 QLineEdit::Normal);
-    if (tree->currentIndex().parent().row() == -1)
-    {
-        qint64 currentTopLevelIndex = tree->currentIndex().row();
-        getProject()->layerAt(currentTopLevelIndex)->setName(newName);
-    }
-    else
-    {
-        qint64 currentTopLevelIndex = tree->currentIndex().parent().row();
-        qint64 currentSecondLevelIndex = tree->currentIndex().row();
-        getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setName(newName);
-    }
-    updateLayerDock();
-}
-
-void Viewer::moreLayer()
-{
-    //TODO
-}
-
-void Viewer::moveUp()
-{
-    if (tree->currentIndex().parent().row() == -1)
-    {
-        qint64 currentTopLevelIndex = tree->currentIndex().row();
-        getProject()->moveUpLayer(currentTopLevelIndex);
-    }
-    else
-    {
-        qint64 currentTopLevelIndex = tree->currentIndex().parent().row();
-        qint64 currentSecondLevelIndex = tree->currentIndex().row();
-        getProject()->layerAt(currentTopLevelIndex)->moveUp(currentSecondLevelIndex);
-    }
-    updateLayerDock();
-    repaint();
-}
-
-void Viewer::moveDown()
-{
-    if (tree->currentIndex().parent().row() == -1)
-    {
-        qint64 currentTopLevelIndex = tree->currentIndex().row();
-        getProject()->moveDownLayer(currentTopLevelIndex);
-    }
-    else
-    {
-        qint64 currentTopLevelIndex = tree->currentIndex().parent().row();
-        qint64 currentSecondLevelIndex = tree->currentIndex().row();
-        getProject()->layerAt(currentTopLevelIndex)->moveDown(currentSecondLevelIndex);
-    }
-    updateLayerDock();
-    repaint();
+    return project_ != nullptr;
 }

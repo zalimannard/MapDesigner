@@ -14,6 +14,7 @@ SOURCES += \
     imageobject.cpp \
     infectionzone.cpp \
     layer.cpp \
+    layerdock.cpp \
     layeritem.cpp \
     main.cpp \
     map.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     imageobject.h \
     infectionzone.h \
     layer.h \
+    layerdock.h \
     layeritem.h \
     map.h \
     myscrollarea.h \

@@ -1,3 +1,6 @@
+#include <QPainter>
+#include <QPainterPath>
+
 #include "polygon.h"
 
 Polygon::Polygon(const Point &firstPoint, const QString &name, const QString &description)
@@ -8,8 +11,12 @@ Polygon::Polygon(const Point &firstPoint, const QString &name, const QString &de
 
 qreal Polygon::perimeter(const Map &map) const
 {
-    // TODO
-    return 0;
+    qreal answer = 0.0;
+    for (auto i = 0; i < points_.size(); ++i)
+    {
+        answer = map.distance(points_.at(i), points_.at((i + 1) % points_.size()));
+    }
+    return answer;
 }
 
 qreal Polygon::square(const Map &map) const
@@ -24,16 +31,39 @@ QStringList Polygon::report(const Map &map) const
     return QStringList("TODO");
 }
 
-void Polygon::draw(QPixmap &pixmap) const
+bool Polygon::isHealthy() const
 {
-    // TODO
+
 }
 
+void Polygon::draw(QPixmap &pixmap) const
+{
+    // Заливка
+    QPainter *painter = new QPainter(&pixmap);
+    QPen pen;
+    pen.setColor(getStyle().getLineColor());
+    pen.setWidth(getStyle().getLineWidth());
+    painter->setPen(pen);
+    QBrush brush;
+    brush.setColor(getStyle().getLineColor());
+    painter->setBrush(brush);
+    QPolygon qPolygon;
+    for (auto i = 0; i < points_.size(); ++i)
+    {
+        QPoint qPoint(points_.at(i).getX(), points_.at(i).getY());
+        qPolygon.append(qPoint);
+    }
+    QPainterPath path;
+    path.addPolygon(qPolygon);
+    painter->fillPath(path, getStyle().getFillColor());
+    painter->drawPath(path);
+    painter->drawPolygon(qPolygon);
+    delete painter;
+}
 
 LayerItem* Polygon::clone() const
 {
-    // TODO
-    return nullptr;
+    return new Polygon(*this);
 }
 
 

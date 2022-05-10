@@ -15,6 +15,7 @@
 
 #include "project.h"
 #include "myscrollarea.h"
+#include "polyline.h"
 
 enum CursorType
 {
@@ -22,9 +23,13 @@ enum CursorType
     MOVE_MAP,
     MOVE_OBJECT,
     POLYLINE,
+    CIRCLE,
+    RECTANGLE,
     POLYGON,
     TEXT,
-    BINDING
+    INFECTION,
+    BINDING,
+    EARTH_POINT
 };
 
 class Viewer : public QMainWindow
@@ -36,8 +41,10 @@ public:
     ~Viewer();
 
 private:
+    bool drawingMode_ = false;
     Project *project_ = nullptr;
     CursorType cursorType_ = CursorType::DEFAULT;
+    Style currentStyle;
 
     void createActions();
     void createMenus();
@@ -53,8 +60,13 @@ private:
     QDockWidget *dock = new QDockWidget("Слои", this);
     QTreeWidget *tree = new QTreeWidget();
 
+    Point getMousePointOnImage(QMouseEvent *event);
     void repaint();
     bool isProjectExist();
+    bool isAnySelected();
+    bool isLayerSelected();
+    bool isObjectSelected();
+    qint64 getCurrentTopLevelIndex();
 
     Project* getProject();
 
@@ -95,9 +107,13 @@ private:
     QAction *moveMapCursorAct;
     QAction *moveObjectCursorAct;
     QAction *polylineCursorAct;
+    QAction *circleCursorAct;
+    QAction *rectangleCursorAct;
     QAction *polygonCursorAct;
     QAction *textCursorAct;
+    QAction *infectionCursorAct;
     QAction *bindingCursorAct;
+    QAction *earthPointAct;
 
 private slots:
     void mousePressEvent(QMouseEvent *event);
@@ -128,6 +144,17 @@ private slots:
 
 
     void setCursorType(CursorType type);
+    void setCursorDefault();
+    void setCursorMoveMap();
+    void setCursorMoveObject();
+    void setCursorPolyline();
+    void setCursorCircle();
+    void setCursorRectangle();
+    void setCursorPolygon();
+    void setCursorText();
+    void setCursorInfection();
+    void setCursorBinding();
+    void setCursorEarthPoint();
 
 
     void addLayer();
@@ -135,5 +162,7 @@ private slots:
     void toggleVisibleLayer();
     void renameLayer();
     void moreLayer();
+    void moveUp();
+    void moveDown();
 };
 #endif // VIEWER_H

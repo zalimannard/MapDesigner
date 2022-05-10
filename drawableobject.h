@@ -2,31 +2,21 @@
 #define DRAWABLEOBJECT_H
 
 #include "imageobject.h"
-
-enum LineType
-{
-    SOLID,
-    DOTTED
-};
+#include "style.h"
 
 class DrawableObject : public ImageObject
 {
 public:
-    DrawableObject(const QString &name, const QString &description);
-    DrawableObject(const DrawableObject &drawableObject) : ImageObject(drawableObject) {};
+    DrawableObject(const Point &keyNode, const QString &name, const QString &description, const bool &visibility = true);
 
-    LineType getLineType() const;
-    void setLineType(const LineType &type);
-    qint64 getLineWidth() const;
-    void setLineWidth(const qint64 &width);
-    QColor getColor() const;
-    void setColor(const QColor &color);
+    void appendPoint(const Point &point);
 
-private:
+    Style getStyle() const;
+    void setStyle(const Style &style);
 
-    LineType lineType_;
-    qint64 lineWidth_;
-    QColor color_;
+protected:
+    QVector<Point> points_;
+    Style style_;
 };
 
 #endif // DRAWABLEOBJECT_H

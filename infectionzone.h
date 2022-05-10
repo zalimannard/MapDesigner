@@ -1,15 +1,15 @@
-#ifndef POLYLINE_H
-#define POLYLINE_H
+#ifndef INFECTIONZONE_H
+#define INFECTIONZONE_H
 
 #include <QVector>
 
 #include "layeritem.h"
 #include "point.h"
 
-class Polyline : public LayerItem
+class InfectionZone : public LayerItem
 {
 public:
-    Polyline(const Point &firstPoint, const QString &name = "Ломаная", const QString &description = "");
+    InfectionZone(const Point &firstPoint, const QString &name = "Зона заражения", const QString &description = "");
 
     qreal perimeter(const Map &map) const override;
     qreal square(const Map &map) const override;
@@ -21,4 +21,4 @@ public:
     LayerItem* clone() const override;
 };
 
-#endif // POLYLINE_H
+#endif // INFECTIONZONE_H

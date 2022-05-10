@@ -1,15 +1,17 @@
-#ifndef POLYLINE_H
-#define POLYLINE_H
+#ifndef CIRCLE_H
+#define CIRCLE_H
 
 #include <QVector>
 
 #include "layeritem.h"
 #include "point.h"
 
-class Polyline : public LayerItem
+class Circle : public LayerItem
 {
 public:
-    Polyline(const Point &firstPoint, const QString &name = "Ломаная", const QString &description = "");
+    Circle(const Point &firstPoint, const QString &name = "Окружность", const QString &description = "");
+
+    qreal radius(const Map &map) const;
 
     qreal perimeter(const Map &map) const override;
     qreal square(const Map &map) const override;
@@ -21,4 +23,4 @@ public:
     LayerItem* clone() const override;
 };
 
-#endif // POLYLINE_H
+#endif // CIRCLE_H

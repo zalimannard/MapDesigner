@@ -14,13 +14,11 @@ public:
     qreal perimeter(const Map &map) const override;
     qreal square(const Map &map) const override;
     QStringList report(const Map &map) const override;
+    bool isHealthy() const override;
 
     void draw(QPixmap &pixmap) const override;
 
     LayerItem* clone() const override;
-
-private:
-    QVector<Point> points;
 };
 
 #endif // POLYGON_H

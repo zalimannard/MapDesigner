@@ -1,15 +1,15 @@
-#ifndef POLYLINE_H
-#define POLYLINE_H
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
 
 #include <QVector>
 
 #include "layeritem.h"
 #include "point.h"
 
-class Polyline : public LayerItem
+class Rectangle : public LayerItem
 {
 public:
-    Polyline(const Point &firstPoint, const QString &name = "Ломаная", const QString &description = "");
+    Rectangle(const Point &firstPoint, const QString &name = "Прямоугольник", const QString &description = "");
 
     qreal perimeter(const Map &map) const override;
     qreal square(const Map &map) const override;
@@ -21,4 +21,4 @@ public:
     LayerItem* clone() const override;
 };
 
-#endif // POLYLINE_H
+#endif // RECTANGLE_H

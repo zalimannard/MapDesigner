@@ -2,7 +2,6 @@
 #include <QTextStream>
 #include <QImage>
 #include <QPixmap>
-#include <QDebug>
 #include <QMessageBox>
 
 #include "project.h"
@@ -59,18 +58,22 @@ void Project::draw(QPixmap &pixmap) const
     {
         map_->draw(pixmap);
     }
-    for(auto i = layers_.size(); i > 0; --i)
+    for(auto i = layers_.size() - 1; i >= 0; --i)
     {
-        layers_.at(i).draw(pixmap);
+        if (layers_.at(i)->isVisible())
+        {
+            layers_.at(i)->draw(pixmap);
+        }
     }
 }
 
-void Project::pushLayer(const Layer &layer)
+void Project::pushLayer(const Layer *layer)
 {
-    layers_.append(layer);
+    Layer* newLayer = layer->clone();
+    layers_.append(newLayer);
 }
 
-Layer Project::layerAt(const qint64 &index)
+Layer* Project::layerAt(const qint64 &index)
 {
     return layers_.at(index);
 }
@@ -80,23 +83,28 @@ void Project::removeLayer(const qint64 &index)
     layers_.remove(index);
 }
 
+qint64 Project::layerSize()
+{
+    return layers_.size();
+}
+
 void Project::moveUpLayer(const qint64 &index)
 {
-    Layer movedLayer = layers_.at(index);
+    Layer* movedLayer = layers_.at(index)->clone();
     layers_.remove(index);
     layers_.insert(qMax((qint64) 0, index - 1), movedLayer);
 }
 
 void Project::moveDownLayer(const qint64 &index)
 {
-    Layer movedLayer = layers_.at(index);
+    Layer* movedLayer = layers_.at(index)->clone();
     layers_.remove(index);
     layers_.insert(qMin((qint64) layers_.size(), index + 1), movedLayer);
 }
 
-QString Project::getMap() const
+Map* Project::getMap() const
 {
-    return map_->getPathToImage();
+    return map_;
 }
 
 void Project::setMap(const QString &path)

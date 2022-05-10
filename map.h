@@ -11,8 +11,8 @@ class Map : public ImageObject
 {
 public:
     Map(const QString &pathToImage);
-    QString getPathToImage() const;
 
+    QString getPathToImage() const;
     void addPoint(const Point &imagePoint, const Point &earthPoint);
     Point imagePointToEarthPoint(const Point &imagePoint) const;
     qreal distance(const Point &first, const Point &second) const;

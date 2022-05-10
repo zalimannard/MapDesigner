@@ -2,15 +2,17 @@
 #define IMAGEOBJECT_H
 
 #include <QPixmap>
+#include "point.h"
 
 class ImageObject
 {
 public:
-    ImageObject(const QString &name, const QString &description);
-    ImageObject(const ImageObject &imageObject) {};
+    ImageObject(const Point &keyNode, const QString &name, const QString &description, const bool &visibility = true);
 
     virtual void draw(QPixmap &pixmap) const = 0;
 
+    Point getPosition() const;
+    void setPosition(const Point &point);
     bool isVisible() const;
     void setVisible(const bool &visibility);
     QString getName() const;
@@ -18,7 +20,8 @@ public:
     QString getDescription() const;
     void setDescription(const QString &description);
 
-private:
+protected:
+    Point position_ = Point(0, 0);
     bool visibility_;
     QString name_;
     QString description_;

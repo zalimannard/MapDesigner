@@ -9,8 +9,10 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    circle.cpp \
     drawableobject.cpp \
     imageobject.cpp \
+    infectionzone.cpp \
     layer.cpp \
     layeritem.cpp \
     main.cpp \
@@ -20,12 +22,16 @@ SOURCES += \
     polygon.cpp \
     polyline.cpp \
     project.cpp \
+    rectangle.cpp \
+    style.cpp \
     text.cpp \
     viewer.cpp
 
 HEADERS += \
+    circle.h \
     drawableobject.h \
     imageobject.h \
+    infectionzone.h \
     layer.h \
     layeritem.h \
     map.h \
@@ -34,6 +40,8 @@ HEADERS += \
     polygon.h \
     polyline.h \
     project.h \
+    rectangle.h \
+    style.h \
     text.h \
     viewer.h
 

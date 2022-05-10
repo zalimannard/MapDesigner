@@ -15,13 +15,14 @@ public:
     void open(const QString &path);
     void draw(QPixmap &pixmap) const;
 
-    void pushLayer(const Layer &Project);
-    Layer layerAt(const qint64 &index);
+    void pushLayer(const Layer *layer);
+    Layer* layerAt(const qint64 &index);
     void removeLayer(const qint64 &index);
+    qint64 layerSize();
     void moveUpLayer(const qint64 &index);
     void moveDownLayer(const qint64 &index);
 
-    QString getMap() const;
+    Map* getMap() const;
     void setMap(const QString &path);
     bool isMapExist() const;
 
@@ -31,7 +32,7 @@ public:
     void setPath(const QString &path);
 
 private:
-    QVector<Layer> layers_;
+    QVector<Layer*> layers_;
     QString name_;
     QString path_;
     Map *map_ = nullptr;

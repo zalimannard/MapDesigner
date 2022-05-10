@@ -2,14 +2,15 @@
 
 #include "map.h"
 
-Map::Map(const QString &pathToImage) : ImageObject("Карта", "")
+Map::Map(const QString &pathToImage) :
+    ImageObject(Point(0.0, 0.0), "Карта", "")
 {
-    this->pathToImage_ = pathToImage;
+    pathToImage_ = pathToImage;
 }
 
 QString Map::getPathToImage() const
 {
-    return this->pathToImage_;
+    return pathToImage_;
 }
 
 qreal earthToMinuteEarth(qreal value)
@@ -19,7 +20,7 @@ qreal earthToMinuteEarth(qreal value)
 
 qreal minuteEarthToEarth(qreal value)
 {
-    return qFloor(value / 60) + (value - qFloor(value / 60) * 60) / 100;
+    return qFloor(value / 60) + (((value / 60) - qFloor(value / 60)) * 60) / 100;
 }
 
 void Map::addPoint(const Point &imagePoint, const Point &earthPoint)
@@ -27,30 +28,30 @@ void Map::addPoint(const Point &imagePoint, const Point &earthPoint)
     Point earthMinutePoint(earthToMinuteEarth(earthPoint.getX()),
                            earthToMinuteEarth(earthPoint.getY()));
 
-    QPair<Point, Point> newPair(imagePoint, earthPoint);
-    if (this->points_.size() > 1)
+    QPair<Point, Point> newPair(imagePoint, earthMinutePoint);
+    if (points_.size() > 1)
     {
-        this->points_.removeFirst();
+        points_.removeFirst();
     }
-    this->points_.append(newPair);
+    points_.append(newPair);
 }
 
 Point Map::imagePointToEarthPoint(const Point &imagePoint) const
 {
     if (points_.size() == 2)
     {
-        qreal latitudeMinutePerPixel = qAbs(this->points_.at(0).second.getX() - this->points_.at(1).second.getX()) /
-                qAbs(this->points_.at(0).first.getX() - this->points_.at(1).first.getX());
-        qreal longitudeMinutePerPixel = qAbs(this->points_.at(0).second.getY() - this->points_.at(1).second.getY()) /
-                qAbs(this->points_.at(0).first.getY() - this->points_.at(1).first.getY());
+        qreal longitudeMinutePerPixel = qAbs(points_.at(0).second.getX() - points_.at(1).second.getX()) /
+                qAbs(points_.at(0).first.getX() - points_.at(1).first.getX());
+        qreal latitudeMinutePerPixel = qAbs(points_.at(0).second.getY() - points_.at(1).second.getY()) /
+                qAbs(points_.at(0).first.getY() - points_.at(1).first.getY());
 
-        qreal latitudeMinutePoint = (imagePoint.getX() - points_.at(0).first.getX()) *
-                latitudeMinutePerPixel + points_.at(0).second.getX();
-        qreal longitudeMinutePoint = (imagePoint.getY() - points_.at(0).first.getY()) *
-                longitudeMinutePerPixel + points_.at(0).second.getY();
+        qreal longitudeMinutePoint = (imagePoint.getX() - points_.at(0).first.getX()) *
+                longitudeMinutePerPixel + points_.at(0).second.getX();
+        qreal latitudeMinutePoint = - (imagePoint.getY() - points_.at(0).first.getY()) *
+                latitudeMinutePerPixel + points_.at(0).second.getY();
 
-        return Point(minuteEarthToEarth(latitudeMinutePoint),
-                     minuteEarthToEarth(longitudeMinutePoint));
+        return Point(minuteEarthToEarth(longitudeMinutePoint),
+                     minuteEarthToEarth(latitudeMinutePoint));
     }
     else
     {
@@ -76,6 +77,6 @@ qreal Map::distance(const Point &imagePointFirst, const Point &imagePointSecond)
 
 void Map::draw(QPixmap &pixmap) const
 {
-    QImage image(this->getPathToImage());
+    QImage image(getPathToImage());
     pixmap = QPixmap::fromImage(image);
 }

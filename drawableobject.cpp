@@ -1,36 +1,22 @@
 #include "drawableobject.h"
 
-DrawableObject::DrawableObject(const QString &name, const QString &description) : ImageObject(name, description)
+DrawableObject::DrawableObject(const Point &keyNode, const QString &name, const QString &description, const bool &visibility) :
+    ImageObject(keyNode, name, description, visibility)
 {
-
+    points_.append(keyNode);
 }
 
-LineType DrawableObject::getLineType() const
+void DrawableObject::appendPoint(const Point &point)
 {
-    return this->lineType_;
+    points_.append(point);
 }
 
-void DrawableObject::setLineType(const LineType &type)
+Style DrawableObject::getStyle() const
 {
-    this->lineType_ = type;
+    return style_;
 }
 
-qint64 DrawableObject::getLineWidth() const
+void DrawableObject::setStyle(const Style &style)
 {
-    return this->lineWidth_;
-}
-
-void DrawableObject::setLineWidth(const qint64 &width)
-{
-    this->lineWidth_ = width;
-}
-
-QColor DrawableObject::getColor() const
-{
-    return this->color_;
-}
-
-void DrawableObject::setColor(const QColor &color)
-{
-    this->color_ = color;
+    style_ = style;
 }

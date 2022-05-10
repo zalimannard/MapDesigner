@@ -9,17 +9,14 @@
 class LayerItem : public DrawableObject
 {
 public:
-    LayerItem(const Point &firstPoint, const QString &name = "Новый объект", const QString &description = "");
-    LayerItem(const LayerItem &layerItem) : DrawableObject(layerItem) {};
+    LayerItem(const Point &keyNode, const QString &name = "Новый объект", const QString &description = "", const bool &visibility = true);
 
     virtual qreal perimeter(const Map &map) const = 0;
     virtual qreal square(const Map &map) const = 0;
-    virtual QStringList report(const Map &map) const = 0;
+    virtual QStringList report(const Map &map) const;
+    virtual bool isHealthy() const = 0;
 
     virtual LayerItem* clone() const = 0;
-
-private:
-    QVector<Point> points_;
 };
 
 #endif // LAYERITEM_H

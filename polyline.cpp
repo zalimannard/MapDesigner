@@ -29,18 +29,33 @@ QStringList Polyline::report(const Map &map) const
     return QStringList("TODO");
 }
 
+bool Polyline::isHealthy() const
+{
+
+}
+
 void Polyline::draw(QPixmap &pixmap) const
 {
     QPainter *painter = new QPainter(&pixmap);
-    painter->setPen(getColor());
-    for (auto i = 0; i < points_.size() + 1; ++i)
+    QPen pen;
+    pen.setColor(getStyle().getLineColor());
+    pen.setWidth(getStyle().getLineWidth());
+    if (getStyle().getLineType() == LineType::SOLID)
     {
-        painter->drawLine(points_.at(i).getX(), points_.at(i + 1).getX(),
-                          points_.at(i).getY(), points_.at(i + 1).getY());
+        pen.setStyle(Qt::PenStyle::SolidLine);
+    }
+    else if (getStyle().getLineType() == LineType::DOTTED)
+    {
+        pen.setStyle(Qt::PenStyle::DotLine);
+    }
+    painter->setPen(pen);
+    for (auto i = 0; i < points_.size() - 1; ++i)
+    {
+        painter->drawLine(points_.at(i).getX(), points_.at(i).getY(),
+                          points_.at(i + 1).getX(), points_.at(i + 1).getY());
     }
     delete painter;
 }
-
 
 LayerItem* Polyline::clone() const
 {

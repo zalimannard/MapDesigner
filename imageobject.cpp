@@ -1,37 +1,51 @@
+#include <QDebug>
+
 #include "imageobject.h"
 
-ImageObject::ImageObject(const QString &name, const QString &description)
+ImageObject::ImageObject(const Point &keyNode, const QString &name, const QString &description, const bool &visibility)
 {
-    this->setName(name);
-    this->setDescription(description);
+    setPosition(keyNode);
+    setVisible(visibility);
+    setName(name);
+    setDescription(description);
+}
+
+Point ImageObject::getPosition() const
+{
+    return position_;
+}
+
+void ImageObject::setPosition(const Point &point)
+{
+    position_ = point;
 }
 
 bool ImageObject::isVisible() const
 {
-    return this->visibility_;
+    return visibility_;
 }
 
 void ImageObject::setVisible(const bool &visibility)
 {
-    this->visibility_ = visibility;
+    visibility_ = visibility;
 }
 
 QString ImageObject::getName() const
 {
-    return this->name_;
+    return name_;
 }
 
 void ImageObject::setName(const QString &name)
 {
-    this->name_ = name;
+    name_ = name;
 }
 
 QString ImageObject::getDescription() const
 {
-    return this->description_;
+    return description_;
 }
 
 void ImageObject::setDescription(const QString &description)
 {
-    this->description_ = description;
+    description_ = description;
 }

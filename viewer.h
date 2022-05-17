@@ -85,6 +85,8 @@ private:
 
     bool isProjectExist();
 
+    void messageNoLayerSelected();
+
 private slots:
     void mousePressEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);

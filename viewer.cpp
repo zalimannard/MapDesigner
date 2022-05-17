@@ -12,6 +12,7 @@
 
 #include "viewer.h"
 #include "project.h"
+#include "circle.h"
 #include "polyline.h"
 #include "polygon.h"
 
@@ -384,6 +385,12 @@ Point Viewer::getMousePointOnImage(QMouseEvent *event)
                  (event->pos().y() - scrollArea->geometry().y() - imageLabel->pos().y()) / scaleFactor_);
 }
 
+void Viewer::messageNoLayerSelected()
+{
+    QMessageBox::warning(this, tr("Предупреждение"),
+            tr("<p>Не выбран слой!</p>"));
+}
+
 void Viewer::mousePressEvent(QMouseEvent *event)
 {
     static LayerItem* layerItem = new Polyline(Point(0, 0));
@@ -421,10 +428,32 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 drawingMode_ = true;
                             }
                         }
+                        else
+                        {
+                            messageNoLayerSelected();
+                        }
                         break;
                     }
                     case CursorType::CIRCLE:
                     {
+                        if (layerDock->isAnySelected())
+                        {
+                            if (drawingMode_)
+                            {
+                                layerItem->appendPoint(getMousePointOnImage(event));
+                            }
+                            else
+                            {
+                                Circle* circle = new Circle(getMousePointOnImage(event));
+                                circle->setStyle(currentStyle);
+                                layerItem = getProject()->layerAt(currentTopLevelIndex)->push(circle);
+                                drawingMode_ = true;
+                            }
+                        }
+                        else
+                        {
+                            messageNoLayerSelected();
+                        }
                         break;
                     }
                     case CursorType::RECTANGLE:

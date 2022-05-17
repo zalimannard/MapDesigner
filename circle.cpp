@@ -57,17 +57,22 @@ bool Circle::isHealthy() const
 
 void Circle::draw(QPixmap &pixmap) const
 {
-    QPainter *painter = new QPainter(&pixmap);
-    QPen pen;
-    pen.setColor(getStyle().getLineColor());
-    pen.setWidth(getStyle().getLineWidth());
-    painter->setPen(pen);
-    QBrush brush;
-    brush.setColor(getStyle().getLineColor());
-    painter->setBrush(brush);
-    painter->drawEllipse(QPointF(points_.at(0).getX(), points_.at(1).getY()), 20, 20);
+    if (isHealthy())
+    {
+        QPainter *painter = new QPainter(&pixmap);
+        QPen pen;
+        pen.setColor(getStyle().getLineColor());
+        pen.setWidth(getStyle().getLineWidth());
+        painter->setPen(pen);
+        QBrush brush;
+        brush.setColor(getStyle().getLineColor());
+        painter->setBrush(brush);
+        painter->drawEllipse(points_.at(0).getX(), points_.at(0).getY(),
+                             points_.at(1).getX() - points_.at(0).getX(),
+                             points_.at(1).getY() - points_.at(0).getY());
 
-    delete painter;
+        delete painter;
+    }
 }
 
 LayerItem* Circle::clone() const

@@ -12,6 +12,8 @@ class LayerDock : public QDockWidget
 public:
     LayerDock(Project* project);
 
+    void update();
+
     bool isProjectExist();
     bool isAnySelected();
     bool isLayerSelected();
@@ -32,7 +34,8 @@ private:
     Project* project_;
     QTreeWidget *tree_ = new QTreeWidget();
 
-    void updateContent();
+    Project* getProject();
+    void setProject(Project* value);
 
 };
 

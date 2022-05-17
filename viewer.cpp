@@ -119,41 +119,6 @@ void Viewer::createActions()
     aboutProgramAct->setShortcut(tr("Ctrl+A"));
     connect(aboutProgramAct, SIGNAL(triggered()), this, SLOT(aboutProgram()));
 
-
-    defaultCursorAct = new QAction(QIcon::fromTheme("pointer"), tr("Обычный курсор"), this);
-    connect(defaultCursorAct, SIGNAL(triggered()), this, SLOT(setCursorDefault()));
-
-    moveMapCursorAct = new QAction(QIcon::fromTheme("transform-browse"), tr("Перемещение по карте"), this);
-    connect(moveMapCursorAct, SIGNAL(triggered()), this, SLOT(setCursorMoveMap()));
-
-    moveObjectCursorAct = new QAction(QIcon::fromTheme("object-move"), tr("Перемещение объекта"), this);
-    connect(moveObjectCursorAct, SIGNAL(triggered()), this, SLOT(setCursorMoveObject()));
-
-    polylineCursorAct = new QAction(QIcon::fromTheme("path-mode-polyline"), tr("Рисовать ломаную"), this);
-    connect(polylineCursorAct, SIGNAL(triggered()), this, SLOT(setCursorPolyline()));
-
-    circleCursorAct = new QAction(QIcon::fromTheme("draw-circle"), tr("Рисовать окружность"), this);
-    connect(circleCursorAct, SIGNAL(triggered()), this, SLOT(setCursorCircle()));
-
-    rectangleCursorAct = new QAction(QIcon::fromTheme("draw-rectangle"), tr("Рисовать прямоугольник"), this);
-    connect(rectangleCursorAct, SIGNAL(triggered()), this, SLOT(setCursorRectangle()));
-
-    polygonCursorAct = new QAction(QIcon::fromTheme("draw-polygon"), tr("Рисовать полигон"), this);
-    connect(polygonCursorAct, SIGNAL(triggered()), this, SLOT(setCursorPolygon()));
-
-    textCursorAct = new QAction(QIcon::fromTheme("edit-select-text"), tr("Добавить текст"), this);
-    connect(textCursorAct, SIGNAL(triggered()), this, SLOT(setCursorText()));
-
-    infectionCursorAct = new QAction(QIcon::fromTheme("im-gadugadu"), tr("Добавить зону заражения"), this);
-    connect(infectionCursorAct, SIGNAL(triggered()), this, SLOT(setCursorInfection()));
-
-    bindingCursorAct = new QAction(QIcon::fromTheme("office-chart-scatter"), tr("Привязать карту"), this);
-    connect(bindingCursorAct, SIGNAL(triggered()), this, SLOT(setCursorBinding()));
-
-    earthPointAct = new QAction(QIcon::fromTheme("edit-paste-in-place"), tr("Узнать координату"), this);
-    connect(earthPointAct, SIGNAL(triggered()), this, SLOT(setCursorEarthPoint()));
-
-
     updateActions();
 }
 
@@ -200,20 +165,9 @@ void Viewer::createMenus()
 
 void Viewer::createToolbar()
 {
-    toolbar->setMovable(true);
-    toolbar->setEnabled(true);
-    toolbar->addAction(defaultCursorAct);
-    toolbar->addAction(moveMapCursorAct);
-    toolbar->addAction(moveObjectCursorAct);
-    toolbar->addAction(polylineCursorAct);
-    toolbar->addAction(circleCursorAct);
-    toolbar->addAction(rectangleCursorAct);
-    toolbar->addAction(polygonCursorAct);
-    toolbar->addAction(textCursorAct);
-    toolbar->addAction(infectionCursorAct);
-    toolbar->addAction(bindingCursorAct);
-    toolbar->addAction(earthPointAct);
-    addToolBar(Qt::LeftToolBarArea, toolbar);
+    toolBar = new ToolBar(project_);
+    addToolBar(Qt::LeftToolBarArea, toolBar);
+    toolBar->setVisible(true);
 }
 
 void Viewer::createLayerDock()
@@ -225,56 +179,12 @@ void Viewer::createLayerDock()
 
 void Viewer::updateActions()
 {
-    if (isProjectExist())
-    {
-        if (project_->isMapExist())
-        {
-            defaultCursorAct->setVisible(true);
-            moveMapCursorAct->setVisible(true);
-            moveObjectCursorAct->setVisible(true);
-            polylineCursorAct->setVisible(true);
-            circleCursorAct->setVisible(true);
-            rectangleCursorAct->setVisible(true);
-            polygonCursorAct->setVisible(true);
-            textCursorAct->setVisible(true);
-            infectionCursorAct->setVisible(true);
-            bindingCursorAct->setVisible(true);
-            earthPointAct->setVisible(true);
-        }
-        else
-        {
-            defaultCursorAct->setVisible(true);
-            moveMapCursorAct->setVisible(false);
-            moveObjectCursorAct->setVisible(false);
-            polylineCursorAct->setVisible(false);
-            circleCursorAct->setVisible(false);
-            rectangleCursorAct->setVisible(false);
-            polygonCursorAct->setVisible(false);
-            textCursorAct->setVisible(false);
-            infectionCursorAct->setVisible(false);
-            bindingCursorAct->setVisible(false);
-            earthPointAct->setVisible(false);
-        }
-    }
-    else
-    {
-        defaultCursorAct->setVisible(true);
-        moveMapCursorAct->setVisible(false);
-        moveObjectCursorAct->setVisible(false);
-        polylineCursorAct->setVisible(false);
-        circleCursorAct->setVisible(false);
-        rectangleCursorAct->setVisible(false);
-        polygonCursorAct->setVisible(false);
-        textCursorAct->setVisible(false);
-        infectionCursorAct->setVisible(false);
-        bindingCursorAct->setVisible(false);
-        earthPointAct->setVisible(false);
-    }
+
 }
 
 void Viewer::updateToolbar()
 {
-    toolbar->setVisible(toolsAct->isChecked());
+    toolBar->setVisible(toolsAct->isChecked());
 }
 
 void Viewer::repaint()
@@ -487,7 +397,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                 {
                     qint64 currentTopLevelIndex = layerDock->getCurrentTopLevelIndex();
 
-                    switch (cursorType_)
+                    switch (toolBar->getCursorType())
                     {
                     case CursorType::DEFAULT:
                         break;
@@ -615,66 +525,6 @@ void Viewer::wheelEvent(QWheelEvent *event)
 }
 
 
-void Viewer::setCursorType(CursorType type)
-{
-    cursorType_ = type;
-    drawingMode_ = false;
-}
-
-void Viewer::setCursorDefault()
-{
-    setCursorType(CursorType::DEFAULT);
-}
-
-void Viewer::setCursorMoveMap()
-{
-    setCursorType(CursorType::MOVE_MAP);
-}
-
-void Viewer::setCursorMoveObject()
-{
-    setCursorType(CursorType::MOVE_OBJECT);
-}
-
-void Viewer::setCursorPolyline()
-{
-    setCursorType(CursorType::POLYLINE);
-}
-
-void Viewer::setCursorCircle()
-{
-    setCursorType(CursorType::CIRCLE);
-}
-
-void Viewer::setCursorRectangle()
-{
-    setCursorType(CursorType::RECTANGLE);
-}
-
-void Viewer::setCursorPolygon()
-{
-    setCursorType(CursorType::POLYGON);
-}
-
-void Viewer::setCursorText()
-{
-    setCursorType(CursorType::TEXT);
-}
-
-void Viewer::setCursorInfection()
-{
-    setCursorType(CursorType::INFECTION);
-}
-
-void Viewer::setCursorBinding()
-{
-    setCursorType(CursorType::BINDING);
-}
-
-void Viewer::setCursorEarthPoint()
-{
-    setCursorType(CursorType::EARTH_POINT);
-}
 
 bool Viewer::isProjectExist()
 {

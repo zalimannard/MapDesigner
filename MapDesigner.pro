@@ -26,6 +26,7 @@ SOURCES += \
     rectangle.cpp \
     style.cpp \
     text.cpp \
+    toolbar.cpp \
     viewer.cpp
 
 HEADERS += \
@@ -45,6 +46,7 @@ HEADERS += \
     rectangle.h \
     style.h \
     text.h \
+    toolbar.h \
     viewer.h
 
 # Default rules for deployment.

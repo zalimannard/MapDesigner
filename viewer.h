@@ -17,21 +17,7 @@
 #include "myscrollarea.h"
 #include "polyline.h"
 #include "layerdock.h"
-
-enum CursorType
-{
-    DEFAULT,
-    MOVE_MAP,
-    MOVE_OBJECT,
-    POLYLINE,
-    CIRCLE,
-    RECTANGLE,
-    POLYGON,
-    TEXT,
-    INFECTION,
-    BINDING,
-    EARTH_POINT
-};
+#include "toolbar.h"
 
 class Viewer : public QMainWindow
 {
@@ -44,7 +30,6 @@ public:
 private:
     bool drawingMode_ = false;
     Project *project_ = nullptr;
-    CursorType cursorType_ = CursorType::DEFAULT;
     Style currentStyle;
 
     void createActions();
@@ -57,7 +42,7 @@ private:
 
     void scaleImage(qreal factor);
     void adjustScrollBar(QScrollBar *scrollBar, qreal factor);
-    QToolBar *toolbar = new QToolBar("Инструменты", this);
+    ToolBar *toolBar;
     LayerDock *layerDock;
 
     Point getMousePointOnImage(QMouseEvent *event);
@@ -98,18 +83,6 @@ private:
     QMenu *windowMenu;
     QMenu *helpMenu;
 
-    QAction *defaultCursorAct;
-    QAction *moveMapCursorAct;
-    QAction *moveObjectCursorAct;
-    QAction *polylineCursorAct;
-    QAction *circleCursorAct;
-    QAction *rectangleCursorAct;
-    QAction *polygonCursorAct;
-    QAction *textCursorAct;
-    QAction *infectionCursorAct;
-    QAction *bindingCursorAct;
-    QAction *earthPointAct;
-
     bool isProjectExist();
 
 private slots:
@@ -139,18 +112,5 @@ private slots:
 
     void aboutProgram();
 
-
-    void setCursorType(CursorType type);
-    void setCursorDefault();
-    void setCursorMoveMap();
-    void setCursorMoveObject();
-    void setCursorPolyline();
-    void setCursorCircle();
-    void setCursorRectangle();
-    void setCursorPolygon();
-    void setCursorText();
-    void setCursorInfection();
-    void setCursorBinding();
-    void setCursorEarthPoint();
 };
 #endif // VIEWER_H

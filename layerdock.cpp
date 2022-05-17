@@ -7,7 +7,7 @@
 
 LayerDock::LayerDock(Project* project)
 {
-    project_ = project;
+    setProject(project);
 
     QPushButton *addLayerBtn = new QPushButton();
     addLayerBtn->setIcon(QIcon::fromTheme("list-add"));
@@ -67,21 +67,21 @@ LayerDock::LayerDock(Project* project)
 void LayerDock::addLayer()
 {
     Layer* newLayer = new Layer();
-    project_->pushLayer(newLayer);
-    updateContent();
+    getProject()->pushLayer(newLayer);
+    update();
 }
 
 void LayerDock::deleteLayer()
 {
     if (isLayerSelected())
     {
-        project_->removeLayer(tree_->currentIndex().row());
+        getProject()->removeLayer(tree_->currentIndex().row());
     }
     else
     {
-        project_->layerAt(tree_->currentIndex().parent().row())->remove(tree_->currentIndex().row());
+        getProject()->layerAt(tree_->currentIndex().parent().row())->remove(tree_->currentIndex().row());
     }
-    updateContent();
+    update();
 }
 
 void LayerDock::toggleVisibleLayer()
@@ -89,17 +89,17 @@ void LayerDock::toggleVisibleLayer()
     if (tree_->currentIndex().parent().row() == -1)
     {
         qint64 currentTopLevelIndex = tree_->currentIndex().row();
-        bool currentVisible = project_->layerAt(currentTopLevelIndex)->isVisible();
-        project_->layerAt(currentTopLevelIndex)->setVisible(!currentVisible);
+        bool currentVisible = getProject()->layerAt(currentTopLevelIndex)->isVisible();
+        getProject()->layerAt(currentTopLevelIndex)->setVisible(!currentVisible);
     }
     else
     {
         qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
         qint64 currentSecondLevelIndex = tree_->currentIndex().row();
-        bool currentVisible = project_->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->isVisible();
-        project_->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setVisible(!currentVisible);
+        bool currentVisible = getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->isVisible();
+        getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setVisible(!currentVisible);
     }
-    updateContent();
+    update();
 }
 
 void LayerDock::renameLayer()
@@ -111,15 +111,15 @@ void LayerDock::renameLayer()
     if (tree_->currentIndex().parent().row() == -1)
     {
         qint64 currentTopLevelIndex = tree_->currentIndex().row();
-        project_->layerAt(currentTopLevelIndex)->setName(newName);
+        getProject()->layerAt(currentTopLevelIndex)->setName(newName);
     }
     else
     {
         qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
         qint64 currentSecondLevelIndex = tree_->currentIndex().row();
-        project_->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setName(newName);
+        getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setName(newName);
     }
-    updateContent();
+    update();
 }
 
 void LayerDock::moreLayer()
@@ -139,15 +139,15 @@ void LayerDock::moveUp()
     if (tree_->currentIndex().parent().row() == -1)
     {
         qint64 currentTopLevelIndex = tree_->currentIndex().row();
-        project_->moveUpLayer(currentTopLevelIndex);
+        getProject()->moveUpLayer(currentTopLevelIndex);
     }
     else
     {
         qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
         qint64 currentSecondLevelIndex = tree_->currentIndex().row();
-        project_->layerAt(currentTopLevelIndex)->moveUp(currentSecondLevelIndex);
+        getProject()->layerAt(currentTopLevelIndex)->moveUp(currentSecondLevelIndex);
     }
-    updateContent();
+    update();
 }
 
 void LayerDock::moveDown()
@@ -155,15 +155,15 @@ void LayerDock::moveDown()
     if (tree_->currentIndex().parent().row() == -1)
     {
         qint64 currentTopLevelIndex = tree_->currentIndex().row();
-        project_->moveDownLayer(currentTopLevelIndex);
+        getProject()->moveDownLayer(currentTopLevelIndex);
     }
     else
     {
         qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
         qint64 currentSecondLevelIndex = tree_->currentIndex().row();
-        project_->layerAt(currentTopLevelIndex)->moveDown(currentSecondLevelIndex);
+        getProject()->layerAt(currentTopLevelIndex)->moveDown(currentSecondLevelIndex);
     }
-    updateContent();
+    update();
 }
 
 bool LayerDock::isAnySelected()
@@ -213,16 +213,16 @@ qint64 LayerDock::getCurrentSecondLevelIndex()
     }
 }
 
-void LayerDock::updateContent()
+void LayerDock::update()
 {
 
     tree_->clear();
-    for (int i = 0; i < project_->layerSize(); ++i)
+    for (int i = 0; i < getProject()->layerSize(); ++i)
     {
         QTreeWidgetItem *item = new QTreeWidgetItem(1);
-        item->setText(0, project_->layerAt(i)->getName());
+        item->setText(0, getProject()->layerAt(i)->getName());
 
-        if (project_->layerAt(i)->isVisible())
+        if (getProject()->layerAt(i)->isVisible())
         {
             item->setText(1, "");
         }
@@ -230,11 +230,11 @@ void LayerDock::updateContent()
         {
             item->setText(1, "Скрыт");
         }
-        for (int j = 0; j < project_->layerAt(i)->size(); ++j)
+        for (int j = 0; j < getProject()->layerAt(i)->size(); ++j)
         {
             QTreeWidgetItem *subItem = new QTreeWidgetItem(1);
-            subItem->setText(0, project_->layerAt(i)->at(j)->getName());
-            if (project_->layerAt(i)->at(j)->isVisible())
+            subItem->setText(0, getProject()->layerAt(i)->at(j)->getName());
+            if (getProject()->layerAt(i)->at(j)->isVisible())
             {
                 subItem->setText(1, "");
             }
@@ -247,4 +247,14 @@ void LayerDock::updateContent()
         tree_->addTopLevelItem(item);
         tree_->expandAll();
     }
+}
+
+Project* LayerDock::getProject()
+{
+    return project_;
+}
+
+void LayerDock::setProject(Project* value)
+{
+    project_ = value;
 }

@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QDebug>
 #include <QDrag>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -15,6 +16,7 @@
 #include "circle.h"
 #include "polyline.h"
 #include "polygon.h"
+#include "rectangle.h"
 
 Viewer::Viewer(QWidget *parent)
     : QMainWindow(parent)
@@ -36,6 +38,19 @@ Viewer::Viewer(QWidget *parent)
 
     setWindowTitle(tr("Map Designer"));
     resize(1280, 720);
+
+    QString projectFilePath = "/home/zalimannard/Projects/MapDesignerTest/Example.mdp";
+    QString projectName = projectFilePath.split("/").last().split(".").first();
+    QString projectDirPath = projectFilePath.remove(projectFilePath.lastIndexOf("/"), projectFilePath.split("/").last().length() + 1);
+    project_ = new Project(projectName);
+    project_->open(projectDirPath);
+    updateActions();
+    updateToolbar();
+    repaint();
+    if (project_->isMapExist())
+    {
+        createLayerDock();
+    }
 }
 
 Viewer::~Viewer()
@@ -201,6 +216,15 @@ void Viewer::repaint()
             imageLabel->resize(pixmap.width() * scaleFactor_, pixmap.height() * scaleFactor_);
         }
     }
+}
+
+void Viewer::endPainting()
+{
+    if (!layerItem->isHealthy())
+    {
+        getProject()->layerAt(layerDock->getCurrentTopLevelIndex())->remove(layerDock->getCurrentSecondLevelIndex());
+    }
+    layerDock->update();
 }
 
 Project* Viewer::getProject()
@@ -393,7 +417,6 @@ void Viewer::messageNoLayerSelected()
 
 void Viewer::mousePressEvent(QMouseEvent *event)
 {
-    static LayerItem* layerItem = new Polyline(Point(0, 0));
     if (this->isProjectExist())
     {
         if (project_->isMapExist())
@@ -406,111 +429,133 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 
                     switch (toolBar->getCursorType())
                     {
-                    case CursorType::DEFAULT:
-                        break;
-                    case CursorType::MOVE_MAP:
-                        break;
-                    case CursorType::MOVE_OBJECT:
-                        break;
-                    case CursorType::POLYLINE:
-                    {
-                        if (layerDock->isAnySelected())
+                        case CursorType::DEFAULT:
+                            break;
+                        case CursorType::MOVE_MAP:
+                            break;
+                        case CursorType::MOVE_OBJECT:
+                            break;
+                        case CursorType::POLYLINE:
                         {
-                            if (drawingMode_)
+                            if (layerDock->isAnySelected())
                             {
-                                layerItem->appendPoint(getMousePointOnImage(event));
+                                if (drawingMode_)
+                                {
+                                    lastPoint_ = layerItem->appendPoint(getMousePointOnImage(event));
+                                }
+                                else
+                                {
+                                    Polyline* polyline = new Polyline(getMousePointOnImage(event));
+                                    polyline->setStyle(currentStyle);
+                                    layerItem = getProject()->layerAt(currentTopLevelIndex)->push(polyline);
+                                    drawingMode_ = true;
+                                }
                             }
                             else
                             {
-                                Polyline* polyline = new Polyline(getMousePointOnImage(event));
-                                polyline->setStyle(currentStyle);
-                                layerItem = getProject()->layerAt(currentTopLevelIndex)->push(polyline);
-                                drawingMode_ = true;
+                                messageNoLayerSelected();
                             }
+                            break;
                         }
-                        else
+                        case CursorType::CIRCLE:
                         {
-                            messageNoLayerSelected();
-                        }
-                        break;
-                    }
-                    case CursorType::CIRCLE:
-                    {
-                        if (layerDock->isAnySelected())
-                        {
-                            if (drawingMode_)
+                            if (layerDock->isAnySelected())
                             {
-                                layerItem->appendPoint(getMousePointOnImage(event));
+                                if (drawingMode_)
+                                {
+                                    lastPoint_ = layerItem->appendPoint(getMousePointOnImage(event));
+                                }
+                                else
+                                {
+                                    Circle* circle = new Circle(getMousePointOnImage(event));
+                                    circle->setStyle(currentStyle);
+                                    layerItem = getProject()->layerAt(currentTopLevelIndex)->push(circle);
+                                    drawingMode_ = true;
+                                }
                             }
                             else
                             {
-                                Circle* circle = new Circle(getMousePointOnImage(event));
-                                circle->setStyle(currentStyle);
-                                layerItem = getProject()->layerAt(currentTopLevelIndex)->push(circle);
-                                drawingMode_ = true;
+                                messageNoLayerSelected();
                             }
+                            break;
                         }
-                        else
+                        case CursorType::RECTANGLE:
                         {
-                            messageNoLayerSelected();
-                        }
-                        break;
-                    }
-                    case CursorType::RECTANGLE:
-                    {
-                        break;
-                    }
-                    case CursorType::POLYGON:
-                    {
-                        if (layerDock->isAnySelected())
-                        {
-                            if (drawingMode_)
+                            if (layerDock->isAnySelected())
                             {
-                                layerItem->appendPoint(getMousePointOnImage(event));
+                                if (drawingMode_)
+                                {
+                                    lastPoint_ = layerItem->appendPoint(getMousePointOnImage(event));
+                                }
+                                else
+                                {
+                                    Rectangle* rectangle = new Rectangle(getMousePointOnImage(event));
+                                    rectangle->setStyle(currentStyle);
+                                    layerItem = getProject()->layerAt(currentTopLevelIndex)->push(rectangle);
+                                    drawingMode_ = true;
+                                }
                             }
                             else
                             {
-                                Polygon* polygon = new Polygon(getMousePointOnImage(event));
-                                polygon->setStyle(currentStyle);
-                                layerItem = getProject()->layerAt(currentTopLevelIndex)->push(polygon);
-                                drawingMode_ = true;
+                                messageNoLayerSelected();
                             }
+                            break;
                         }
-                        break;
-                    }
-                    case CursorType::TEXT:
-                    {
-                        break;
-                    }
-                    case CursorType::INFECTION:
-                    {
-                        break;
-                    }
-                    case CursorType::BINDING:
-                    {
-                        qreal longitude = QInputDialog::getDouble(0,
-                                                                "Ввод",
-                                                                "Долгота:",
-                                                                QLineEdit::Normal);
-                        qreal latitude = QInputDialog::getDouble(0,
-                                                                "Ввод",
-                                                                "Широта:",
-                                                                QLineEdit::Normal);
-                        getProject()->getMap()->addPoint(getMousePointOnImage(event), Point(longitude, latitude));
-                    }
-                        break;
-                    case CursorType::EARTH_POINT:
-                    {
-                        Point earthPoint = getProject()->getMap()->imagePointToEarthPoint(getMousePointOnImage(event));
+                        case CursorType::POLYGON:
+                        {
+                            if (layerDock->isAnySelected())
+                            {
+                                if (drawingMode_)
+                                {
+                                    lastPoint_ = layerItem->appendPoint(getMousePointOnImage(event));
+                                }
+                                else
+                                {
+                                    Polygon* polygon = new Polygon(getMousePointOnImage(event));
+                                    polygon->setStyle(currentStyle);
+                                    layerItem = getProject()->layerAt(currentTopLevelIndex)->push(polygon);
+                                    drawingMode_ = true;
+                                }
+                            }
+                            else
+                            {
+                                messageNoLayerSelected();
+                            }
+                            break;
+                        }
+                        case CursorType::TEXT:
+                        {
+                            break;
+                        }
+                        case CursorType::INFECTION:
+                        {
+                            break;
+                        }
+                        case CursorType::BINDING:
+                        {
+                            qreal longitude = QInputDialog::getDouble(0,
+                                                                    "Ввод",
+                                                                    "Долгота:",
+                                                                    QLineEdit::Normal);
+                            qreal latitude = QInputDialog::getDouble(0,
+                                                                    "Ввод",
+                                                                    "Широта:",
+                                                                    QLineEdit::Normal);
+                            getProject()->getMap()->addPoint(getMousePointOnImage(event), Point(longitude, latitude));
+                        }
+                            break;
+                        case CursorType::EARTH_POINT:
+                        {
+                            Point earthPoint = getProject()->getMap()->imagePointToEarthPoint(getMousePointOnImage(event));
 
-                        QMessageBox message;
-                        message.setText("Координаты точки:");
-                        message.setInformativeText("Долгота: " + QString::number(earthPoint.getX()) + "\n" +
-                                                   "Широта:  " + QString::number(earthPoint.getY()));
-                        message.exec();
-                    }
-                    default:
-                        break;
+                            QMessageBox message;
+                            message.setText("Координаты точки:");
+                            message.setInformativeText("Долгота: " + QString::number(earthPoint.getX()) + "\n" +
+                                                       "Широта:  " + QString::number(earthPoint.getY()));
+                            message.exec();
+                        }
+                        default:
+                            break;
                     }
                     break;
                 }
@@ -531,6 +576,37 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 void Viewer::mouseDoubleClickEvent(QMouseEvent *event)
 {
     drawingMode_ = false;
+    if (lastPoint_ != nullptr)
+    {
+        endPainting();
+    }
+    lastPoint_ = nullptr;
+    repaint();
+}
+
+void Viewer::mouseMoveEvent(QMouseEvent *event)
+{
+    if (lastPoint_ != nullptr)
+    {
+        Point point = getMousePointOnImage(event);
+        lastPoint_->setX(point.getX());
+        lastPoint_->setY(point.getY());
+    }
+    repaint();
+}
+
+void Viewer::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (drawingMode_)
+    {
+        if (layerItem->isMaximumPoint())
+        {
+            drawingMode_ = false;
+            lastPoint_ = nullptr;
+            endPainting();
+        }
+    }
+    repaint();
 }
 
 void Viewer::wheelEvent(QWheelEvent *event)
@@ -552,8 +628,6 @@ void Viewer::wheelEvent(QWheelEvent *event)
         }
     }
 }
-
-
 
 bool Viewer::isProjectExist()
 {

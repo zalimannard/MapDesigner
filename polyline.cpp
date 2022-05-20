@@ -25,13 +25,19 @@ qreal Polyline::square(const Map &map) const
 
 QStringList Polyline::report(const Map &map) const
 {
-    // TODO
-    return QStringList("TODO");
+    QStringList reportText = LayerItem::report(map);
+
+    return reportText;
 }
 
 bool Polyline::isHealthy() const
 {
+    return (points_.size() > 1);
+}
 
+bool Polyline::isMaximumPoint() const
+{
+    return false;
 }
 
 void Polyline::draw(QPixmap &pixmap) const

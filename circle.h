@@ -17,6 +17,7 @@ public:
     qreal square(const Map &map) const override;
     QStringList report(const Map &map) const override;
     bool isHealthy() const override;
+    bool isMaximumPoint() const override;
 
     void draw(QPixmap &pixmap) const override;
 

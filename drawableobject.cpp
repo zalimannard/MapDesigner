@@ -6,9 +6,10 @@ DrawableObject::DrawableObject(const Point &keyNode, const QString &name, const 
     points_.append(keyNode);
 }
 
-void DrawableObject::appendPoint(const Point &point)
+Point* DrawableObject::appendPoint(const Point &point)
 {
     points_.append(point);
+    return &points_.last();
 }
 
 Style DrawableObject::getStyle() const

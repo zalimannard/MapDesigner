@@ -1,24 +1,27 @@
-//#ifndef TEXT_H
-//#define TEXT_H
+#ifndef TEXT_H
+#define TEXT_H
 
-//#include <QFont>
-//#include <QString>
+#include <QFont>
+#include <QString>
 
-//#include "layeritem.h"
+#include "layeritem.h"
 
-//class Text : public LayerItem
-//{
-//public:
-//    Text();
+class Text : public LayerItem
+{
+public:
+    Text(const Point &firstPoint, const QString &name = "Текст", const QString &description = "");
 
-//    QFont font;
-//    QString content_;
+    qreal perimeter(const Map &map) const override;
+    qreal square(const Map &map) const override;
+    QStringList report(const Map &map) const override;
+    bool isHealthy() const override;
+    bool isMaximumPoint() const override;
 
-//    QString getColor() const;
-//    void setColor(QString newColor);
+    void draw(QPixmap &pixmap) const override;
 
-//private:
-//    QString color_;
-//};
+    LayerItem* clone() const override;
+};
 
-//#endif // TEXT_H
+
+
+#endif

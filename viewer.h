@@ -29,7 +29,9 @@ public:
 
 private:
     bool drawingMode_ = false;
+    Point* lastPoint_ = nullptr;
     Project *project_ = nullptr;
+    LayerItem* layerItem = new Polyline(Point(0, 0));
     Style currentStyle;
 
     void createActions();
@@ -47,6 +49,7 @@ private:
 
     Point getMousePointOnImage(QMouseEvent *event);
     void repaint();
+    void endPainting();
 
     Project* getProject();
 
@@ -90,6 +93,8 @@ private:
 private slots:
     void mousePressEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
 
     void createProject();

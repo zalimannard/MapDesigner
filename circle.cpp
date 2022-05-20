@@ -55,6 +55,11 @@ bool Circle::isHealthy() const
     return (points_.size() == 2);
 }
 
+bool Circle::isMaximumPoint() const
+{
+    return (points_.size() == 2);
+}
+
 void Circle::draw(QPixmap &pixmap) const
 {
     if (isHealthy())

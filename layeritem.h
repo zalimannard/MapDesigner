@@ -15,6 +15,7 @@ public:
     virtual qreal square(const Map &map) const = 0;
     virtual QStringList report(const Map &map) const;
     virtual bool isHealthy() const = 0;
+    virtual bool isMaximumPoint() const = 0;
 
     virtual LayerItem* clone() const = 0;
 };

@@ -27,18 +27,23 @@ qreal Polygon::square(const Map &map) const
 
 QStringList Polygon::report(const Map &map) const
 {
-    // TODO
-    return QStringList("TODO");
+    QStringList reportText = LayerItem::report(map);
+
+    return reportText;
 }
 
 bool Polygon::isHealthy() const
 {
+    return (points_.size() > 1);
+}
 
+bool Polygon::isMaximumPoint() const
+{
+    return false;
 }
 
 void Polygon::draw(QPixmap &pixmap) const
 {
-    // Заливка
     QPainter *painter = new QPainter(&pixmap);
     QPen pen;
     pen.setColor(getStyle().getLineColor());

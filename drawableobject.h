@@ -9,7 +9,7 @@ class DrawableObject : public ImageObject
 public:
     DrawableObject(const Point &keyNode, const QString &name, const QString &description, const bool &visibility = true);
 
-    void appendPoint(const Point &point);
+    Point* appendPoint(const Point &point);
 
     Style getStyle() const;
     void setStyle(const Style &style);

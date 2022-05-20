@@ -31,6 +31,11 @@ bool InfectionZone::isHealthy() const
 
 }
 
+bool InfectionZone::isMaximumPoint() const
+{
+
+}
+
 void InfectionZone::draw(QPixmap &pixmap) const
 {
 

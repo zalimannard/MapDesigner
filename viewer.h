@@ -31,7 +31,8 @@ private:
     bool drawingMode_ = false;
     Point* lastPoint_ = nullptr;
     Project *project_ = nullptr;
-    LayerItem* layerItem = new Polyline(Point(0, 0));
+    LayerItem* lastLayerItem = nullptr;
+    CursorType lastCursorType_ = CursorType::DEFAULT;
     Style currentStyle;
 
     void createActions();

@@ -76,13 +76,7 @@ void LayerDock::deleteLayer()
 {
     if (isLayerSelected())
     {
-        qint64 topLevelIndex = getCurrentTopLevelIndex();
         getProject()->removeLayer(tree_->currentIndex().row());
-        if (tree_->topLevelItemCount() > 0)
-        {
-            tree_->setCurrentIndex(QModelIndex());
-            tree_->setCurrentItem(tree_->itemAt(0, 0), 0);
-        }
     }
     else
     {

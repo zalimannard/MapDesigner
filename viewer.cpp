@@ -17,6 +17,7 @@
 #include "polyline.h"
 #include "polygon.h"
 #include "rectangle.h"
+#include "text.h"
 
 Viewer::Viewer(QWidget *parent)
     : QMainWindow(parent)
@@ -512,6 +513,17 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             }
                             case CursorType::TEXT:
                             {
+                                if (layerDock->isAnySelected())
+                                {
+                                    Text* text = new Text(getMousePointOnImage(event));
+                                    text->setStyle(currentStyle);
+                                    lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(text);
+                                    drawingMode_ = true;
+                                }
+                                else
+                                {
+                                    messageNoLayerSelected();
+                                }
                                 break;
                             }
                             case CursorType::INFECTION:

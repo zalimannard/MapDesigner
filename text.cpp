@@ -48,7 +48,7 @@ void Text::draw(QPixmap &pixmap) const
         brush.setColor(getStyle().getLineColor());
         painter->setBrush(brush);
         const QString str = getName();
-        painter->drawText(points_.at(0).getX(), points_.at(1).getY(), str);
+        painter->drawText(points_.at(0).getX(), points_.at(0).getY(), str);
 
         delete painter;
     }

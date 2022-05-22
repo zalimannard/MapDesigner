@@ -22,9 +22,11 @@ public:
     void moveUpLayer(const qint64 &index);
     void moveDownLayer(const qint64 &index);
 
+    bool isMapExist() const;
     Map* getMap() const;
     void setMap(const QString &path);
-    bool isMapExist() const;
+    Style* getStyle() const;
+    void setStyle(const Style &style);
 
     QString getName() const;
     void setName(const QString &name);
@@ -36,6 +38,7 @@ private:
     QString name_;
     QString path_;
     Map *map_ = nullptr;
+    Style *style_ = new Style();
 
 };
 

@@ -41,6 +41,7 @@ public:
     QAction *infectionCursorAct;
     QAction *bindingCursorAct;
     QAction *earthPointAct;
+    QAction *styleChooserAct;
 
 private slots:
     void setCursorType(CursorType value);
@@ -55,6 +56,7 @@ private slots:
     void setCursorInfection();
     void setCursorBinding();
     void setCursorEarthPoint();
+    void setCursorStyleChooser();
 
 private:
     Project* project_;

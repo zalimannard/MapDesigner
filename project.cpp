@@ -102,6 +102,11 @@ void Project::moveDownLayer(const qint64 &index)
     layers_.insert(qMin((qint64) layers_.size(), index + 1), movedLayer);
 }
 
+bool Project::isMapExist() const
+{
+    return map_ != nullptr;
+}
+
 Map* Project::getMap() const
 {
     return map_;
@@ -112,15 +117,14 @@ void Project::setMap(const QString &path)
     map_ = new Map(path);
 }
 
-
-bool Project::isMapExist() const
+Style* Project::getStyle() const
 {
-    return map_ != nullptr;
+    return style_;
 }
 
-void Project::setName(const QString &name)
+void Project::setStyle(const Style &style)
 {
-    this->name_ = name;
+    style_ = new Style(style);
 }
 
 QString Project::getName() const
@@ -128,12 +132,17 @@ QString Project::getName() const
     return name_;
 }
 
-void Project::setPath(const QString &path)
+void Project::setName(const QString &name)
 {
-    this->path_ = path;
+    this->name_ = name;
 }
 
 QString Project::getPath() const
 {
     return path_;
+}
+
+void Project::setPath(const QString &path)
+{
+    this->path_ = path;
 }

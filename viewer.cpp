@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QGroupBox>
+#include <QTimer>
 
 #include "viewer.h"
 #include "project.h"
@@ -17,6 +18,7 @@
 #include "polyline.h"
 #include "polygon.h"
 #include "rectangle.h"
+#include "stylechooser.h"
 #include "text.h"
 
 Viewer::Viewer(QWidget *parent)
@@ -47,7 +49,9 @@ Viewer::Viewer(QWidget *parent)
     project_->open(projectDirPath);
     updateActions();
     updateToolbar();
+
     repaint();
+
     if (project_->isMapExist())
     {
         createLayerDock();
@@ -201,6 +205,9 @@ void Viewer::updateActions()
 
 void Viewer::updateToolbar()
 {
+    removeToolBar(toolBar);
+    toolBar = new ToolBar(project_);
+    addToolBar(Qt::LeftToolBarArea, toolBar);
     toolBar->setVisible(toolsAct->isChecked());
 }
 
@@ -456,7 +463,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 if (layerDock->isAnySelected())
                                 {
                                     Polyline* polyline = new Polyline(getMousePointOnImage(event));
-                                    polyline->setStyle(currentStyle);
+                                    polyline->setStyle(*getProject()->getStyle());
                                     lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(polyline);
                                     drawingMode_ = true;
                                 }
@@ -471,7 +478,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 if (layerDock->isAnySelected())
                                 {
                                     Circle* circle = new Circle(getMousePointOnImage(event));
-                                    circle->setStyle(currentStyle);
+                                    circle->setStyle(*getProject()->getStyle());
                                     lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(circle);
                                     drawingMode_ = true;
                                 }
@@ -486,7 +493,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 if (layerDock->isAnySelected())
                                 {
                                     Rectangle* rectangle = new Rectangle(getMousePointOnImage(event));
-                                    rectangle->setStyle(currentStyle);
+                                    rectangle->setStyle(*getProject()->getStyle());
                                     lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(rectangle);
                                     drawingMode_ = true;
                                 }
@@ -501,7 +508,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 if (layerDock->isAnySelected())
                                 {
                                     Polygon* polygon = new Polygon(getMousePointOnImage(event));
-                                    polygon->setStyle(currentStyle);
+                                    polygon->setStyle(*getProject()->getStyle());
                                     lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(polygon);
                                     drawingMode_ = true;
                                 }
@@ -516,7 +523,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 if (layerDock->isAnySelected())
                                 {
                                     Text* text = new Text(getMousePointOnImage(event));
-                                    text->setStyle(currentStyle);
+                                    text->setStyle(*getProject()->getStyle());
                                     lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(text);
                                     drawingMode_ = true;
                                 }
@@ -541,8 +548,8 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                                                         "Широта:",
                                                                         QLineEdit::Normal);
                                 getProject()->getMap()->addPoint(getMousePointOnImage(event), Point(longitude, latitude));
-                            }
                                 break;
+                            }
                             case CursorType::EARTH_POINT:
                             {
                                 Point earthPoint = getProject()->getMap()->imagePointToEarthPoint(getMousePointOnImage(event));
@@ -552,6 +559,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 message.setInformativeText("Долгота: " + QString::number(earthPoint.getX()) + "\n" +
                                                            "Широта:  " + QString::number(earthPoint.getY()));
                                 message.exec();
+                                break;
                             }
                             default:
                                 break;

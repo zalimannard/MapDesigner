@@ -25,6 +25,7 @@ SOURCES += \
     project.cpp \
     rectangle.cpp \
     style.cpp \
+    stylechooser.cpp \
     text.cpp \
     toolbar.cpp \
     viewer.cpp
@@ -45,6 +46,7 @@ HEADERS += \
     project.h \
     rectangle.h \
     style.h \
+    stylechooser.h \
     text.h \
     toolbar.h \
     viewer.h

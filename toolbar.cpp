@@ -1,5 +1,7 @@
 #include "toolbar.h"
 
+#include "stylechooser.h"
+
 ToolBar::ToolBar(Project* project)
 {
     setProject(project);
@@ -38,6 +40,9 @@ ToolBar::ToolBar(Project* project)
     earthPointAct = new QAction(QIcon::fromTheme("edit-paste-in-place"), tr("Узнать координату"), this);
     connect(earthPointAct, SIGNAL(triggered()), this, SLOT(setCursorEarthPoint()));
 
+    styleChooserAct = new QAction(QIcon::fromTheme("color-management"), tr("Редактировать текущий стиль"), this);
+    connect(styleChooserAct, SIGNAL(triggered()), this, SLOT(setCursorStyleChooser()));
+
     setMovable(true);
     setEnabled(true);
     addAction(defaultCursorAct);
@@ -51,6 +56,7 @@ ToolBar::ToolBar(Project* project)
     addAction(infectionCursorAct);
     addAction(bindingCursorAct);
     addAction(earthPointAct);
+    addAction(styleChooserAct);
 }
 
 bool ToolBar::isProjectExist()
@@ -117,12 +123,6 @@ void ToolBar::setCursorType(CursorType value)
     cursorType_ = value;
 }
 
-//void ToolBar::setCursorType(CursorType type)
-//{
-//    cursorType_ = type;
-//    drawingMode_ = false;
-//}
-
 void ToolBar::setCursorDefault()
 {
     setCursorType(CursorType::DEFAULT);
@@ -176,6 +176,11 @@ void ToolBar::setCursorBinding()
 void ToolBar::setCursorEarthPoint()
 {
     setCursorType(CursorType::EARTH_POINT);
+}
+
+void ToolBar::setCursorStyleChooser()
+{
+    StyleChooser* styleChooser = new StyleChooser(getProject()->getStyle());
 }
 
 Project* ToolBar::getProject()

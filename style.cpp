@@ -2,7 +2,7 @@
 
 Style::Style()
 {
-    setLineType(LineType::SOLID);
+    setLineType(LineType::DOTTED);
     setLineWidth(5);
     setLineColor(QColor(255, 0, 0));
     setFillColor(QColor(0, 255, 0));

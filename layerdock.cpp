@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QInputDialog>
+#include <QMessageBox>
 
 LayerDock::LayerDock(Project* project)
 {
@@ -69,20 +70,49 @@ void LayerDock::addLayer()
 {
     Layer* newLayer = new Layer();
     getProject()->pushLayer(newLayer);
+    qint64 topLevelIndex = getCurrentTopLevelIndex();
     update();
+    QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex));
+    tree_->setCurrentItem(newSelectedLayer);
 }
 
 void LayerDock::deleteLayer()
 {
-    if (isLayerSelected())
+    qint64 topLevelIndex = getCurrentTopLevelIndex();
+    qint64 secondLevelIndex = getCurrentSecondLevelIndex();
+    bool memLayerSelected = isLayerSelected();
+    bool memObjectSelected = isObjectSelected();
+    if (memLayerSelected)
     {
         getProject()->removeLayer(tree_->currentIndex().row());
     }
-    else
+    else if (memObjectSelected)
     {
         getProject()->layerAt(tree_->currentIndex().parent().row())->remove(tree_->currentIndex().row());
     }
     update();
+    if (memLayerSelected)
+    {
+        if (tree_->topLevelItemCount() > 0)
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex - 1));
+            tree_->setCurrentItem(newSelectedLayer);
+        }
+    }
+    else if (memObjectSelected)
+    {
+        if (tree_->topLevelItem(topLevelIndex)->childCount() > 0)
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex));
+            QTreeWidgetItem* newSelectedObject = newSelectedLayer->child(qMax((qint64) 0, secondLevelIndex - 1));
+            tree_->setCurrentItem(newSelectedObject);
+        }
+        else
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(topLevelIndex);
+            tree_->setCurrentItem(newSelectedLayer);
+        }
+    }
 }
 
 void LayerDock::toggleVisibleLayer()
@@ -123,15 +153,19 @@ void LayerDock::renameLayer()
     update();
 }
 
-void LayerDock::moreLayer()
+void LayerDock::moreLayer(Map &map)
 {
     if (isLayerSelected())
     {
-
+        QMessageBox::critical(this, tr("Предупреждение"),
+                tr("<p>Выбран слой</p>"));
     }
     else if (isObjectSelected())
     {
-
+        qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
+        qint64 currentSecondLevelIndex = tree_->currentIndex().row();
+//        QMessageBox::information(this, tr("Предупреждение"),
+//                              tr(getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->report(map)));
     }
 }
 
@@ -153,15 +187,15 @@ void LayerDock::moveUp()
 
 void LayerDock::moveDown()
 {
-    if (tree_->currentIndex().parent().row() == -1)
+    if (isLayerSelected())
     {
-        qint64 currentTopLevelIndex = tree_->currentIndex().row();
+        qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
         getProject()->moveDownLayer(currentTopLevelIndex);
     }
     else
     {
-        qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
-        qint64 currentSecondLevelIndex = tree_->currentIndex().row();
+        qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
+        qint64 currentSecondLevelIndex = getCurrentSecondLevelIndex();
         getProject()->layerAt(currentTopLevelIndex)->moveDown(currentSecondLevelIndex);
     }
     update();

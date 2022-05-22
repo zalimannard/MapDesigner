@@ -29,8 +29,9 @@ public:
 
 private:
     bool drawingMode_ = false;
+    bool windMode_ = false;
     Point* lastPoint_ = nullptr;
-    Project *project_ = nullptr;
+    Project* project_ = nullptr;
     LayerItem* lastLayerItem = nullptr;
     CursorType lastCursorType_ = CursorType::DEFAULT;
     Style currentStyle;
@@ -45,8 +46,8 @@ private:
 
     void scaleImage(qreal factor);
     void adjustScrollBar(QScrollBar *scrollBar, qreal factor);
-    ToolBar *toolBar;
-    LayerDock *layerDock;
+    ToolBar *toolBar = nullptr;
+    LayerDock *layerDock = nullptr;
 
     Point getMousePointOnImage(QMouseEvent *event);
     void repaint();

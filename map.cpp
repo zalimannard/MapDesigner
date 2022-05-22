@@ -6,6 +6,7 @@ Map::Map(const QString &pathToImage) :
     ImageObject(Point(0.0, 0.0), "Карта", "")
 {
     pathToImage_ = pathToImage;
+    wind_ = new Wind(Point(0.0, 0.0));
 }
 
 QString Map::getPathToImage() const
@@ -77,18 +78,37 @@ qreal Map::distance(const Point &imagePointFirst, const Point &imagePointSecond)
 
 qreal Map::getMeterPerPixelX() const
 {
-    Point thirdPoint(points_.at(0).first.getX(), points_.at(1).first.getY());
-    return distance(thirdPoint, points_.at(1).first) / qAbs(thirdPoint.getX() - points_.at(1).first.getX());
+    if (points_.size() > 1)
+    {
+        Point thirdPoint(points_.at(0).first.getX(), points_.at(1).first.getY());
+        return distance(thirdPoint, points_.at(1).first) / qAbs(thirdPoint.getX() - points_.at(1).first.getX());
+    }
+    return 0;
 }
 
 qreal Map::getMeterPerPixelY() const
 {
-    Point thirdPoint(points_.at(0).first.getX(), points_.at(1).first.getY());
-    return distance(thirdPoint, points_.at(0).first) / qAbs(thirdPoint.getY() - points_.at(0).first.getY());
+    if (points_.size() > 1)
+    {
+        Point thirdPoint(points_.at(0).first.getX(), points_.at(1).first.getY());
+        return distance(thirdPoint, points_.at(0).first) / qAbs(thirdPoint.getY() - points_.at(0).first.getY());
+    }
+    return 0;
+}
+
+Wind* Map::getWind()
+{
+    return wind_;
+}
+
+void Map::setWind(Wind &value)
+{
+    wind_ = &value;
 }
 
 void Map::draw(QPixmap &pixmap) const
 {
     QImage image(getPathToImage());
     pixmap = QPixmap::fromImage(image);
+    wind_->draw(pixmap);
 }

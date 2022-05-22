@@ -5,11 +5,13 @@
 
 #include "layeritem.h"
 #include "point.h"
+#include "substance.h"
 
 class InfectionZone : public LayerItem
 {
 public:
-    InfectionZone(const Point &firstPoint, const QString &name = "Зона заражения", const QString &description = "");
+    InfectionZone(const Point &firstPoint,// const Substance substance,
+                  const QString &name = "Зона заражения", const QString &description = "");
 
     qreal perimeter(const Map &map) const override;
     qreal area(const Map &map) const override;
@@ -20,6 +22,7 @@ public:
     void draw(QPixmap &pixmap) const override;
 
     LayerItem* clone() const override;
+
 };
 
 #endif // INFECTIONZONE_H

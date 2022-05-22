@@ -186,16 +186,22 @@ void Viewer::createMenus()
 
 void Viewer::createToolbar()
 {
-    toolBar = new ToolBar(project_);
-    addToolBar(Qt::LeftToolBarArea, toolBar);
-    toolBar->setVisible(true);
+    if (toolBar == nullptr)
+    {
+        toolBar = new ToolBar(project_);
+        addToolBar(Qt::LeftToolBarArea, toolBar);
+        toolBar->setVisible(true);
+    }
 }
 
 void Viewer::createLayerDock()
 {
-    layerDock = new LayerDock(project_);
-    addDockWidget(Qt::RightDockWidgetArea, layerDock);
-    layerDock->setVisible(true);
+    if (layerDock == nullptr)
+    {
+        layerDock = new LayerDock(project_);
+        addDockWidget(Qt::RightDockWidgetArea, layerDock);
+        layerDock->setVisible(true);
+    }
 }
 
 void Viewer::updateActions()
@@ -444,7 +450,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                         endPainting();
                     }
 
-                    if (drawingMode_)
+                    if (windMode_)
+                    {
+                        lastPoint_ = getProject()->getMap()->getWind()->appendPoint(getMousePointOnImage(event));
+                    }
+                    else if (drawingMode_)
                     {
                         lastPoint_ = lastLayerItem->appendPoint(getMousePointOnImage(event));
                     }
@@ -561,6 +571,15 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 message.exec();
                                 break;
                             }
+                            case CursorType::WIND:
+                            {
+                                Wind* wind = new Wind(getMousePointOnImage(event));
+                                wind->setStyle(*getProject()->getStyle());
+                                getProject()->getMap()->setWind(*wind);
+                                getProject()->getMap()->getWind()->setApplied(false);
+                                windMode_ = true;
+                                break;
+                            }
                             default:
                                 break;
                         }
@@ -606,7 +625,18 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 
 void Viewer::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (drawingMode_)
+    if (windMode_)
+    {
+        if (getProject()->getMap()->getWind()->isMaximumPoint())
+        {
+            windMode_ = false;
+            lastPoint_ = nullptr;
+            endPainting();
+            toolBar->setCursorType(CursorType::DEFAULT);
+            getProject()->getMap()->getWind()->setApplied(true);
+        }
+    }
+    else if (drawingMode_)
     {
         if (lastLayerItem->isMaximumPoint())
         {

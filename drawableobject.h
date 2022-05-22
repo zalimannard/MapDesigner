@@ -11,6 +11,8 @@ public:
 
     Point* appendPoint(const Point &point);
 
+    virtual bool isHealthy() const = 0;
+    virtual bool isMaximumPoint() const = 0;
     Style getStyle() const;
     void setStyle(const Style &style);
 

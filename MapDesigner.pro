@@ -26,9 +26,11 @@ SOURCES += \
     rectangle.cpp \
     style.cpp \
     stylechooser.cpp \
+    substance.cpp \
     text.cpp \
     toolbar.cpp \
-    viewer.cpp
+    viewer.cpp \
+    wind.cpp
 
 HEADERS += \
     circle.h \
@@ -47,9 +49,11 @@ HEADERS += \
     rectangle.h \
     style.h \
     stylechooser.h \
+    substance.h \
     text.h \
     toolbar.h \
-    viewer.h
+    viewer.h \
+    wind.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

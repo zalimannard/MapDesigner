@@ -44,6 +44,16 @@ void Layer::moveDown(const qint64 &index)
     items_.insert(qMin((qint64) items_.size(), index + 1), moveItem);
 }
 
+bool Layer::isHealthy() const
+{
+    return true;
+}
+
+bool Layer::isMaximumPoint() const
+{
+    return true;
+}
+
 void Layer::draw(QPixmap &pixmap) const
 {
     for (LayerItem *item : items_)

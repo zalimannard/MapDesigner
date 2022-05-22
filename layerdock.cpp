@@ -84,11 +84,11 @@ void LayerDock::deleteLayer()
     bool memObjectSelected = isObjectSelected();
     if (memLayerSelected)
     {
-        getProject()->removeLayer(tree_->currentIndex().row());
+        getProject()->removeLayer(getCurrentTopLevelIndex());
     }
     else if (memObjectSelected)
     {
-        getProject()->layerAt(tree_->currentIndex().parent().row())->remove(tree_->currentIndex().row());
+        getProject()->layerAt(getCurrentTopLevelIndex())->remove(getCurrentSecondLevelIndex());
     }
     update();
     if (memLayerSelected)
@@ -117,16 +117,16 @@ void LayerDock::deleteLayer()
 
 void LayerDock::toggleVisibleLayer()
 {
-    if (tree_->currentIndex().parent().row() == -1)
+    if (isLayerSelected())
     {
-        qint64 currentTopLevelIndex = tree_->currentIndex().row();
+        qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
         bool currentVisible = getProject()->layerAt(currentTopLevelIndex)->isVisible();
         getProject()->layerAt(currentTopLevelIndex)->setVisible(!currentVisible);
     }
-    else
+    else if (isObjectSelected())
     {
-        qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
-        qint64 currentSecondLevelIndex = tree_->currentIndex().row();
+        qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
+        qint64 currentSecondLevelIndex = getCurrentSecondLevelIndex();
         bool currentVisible = getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->isVisible();
         getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setVisible(!currentVisible);
     }
@@ -135,20 +135,23 @@ void LayerDock::toggleVisibleLayer()
 
 void LayerDock::renameLayer()
 {
-    QString newName = QInputDialog::getText(this,
-                                 QString::fromUtf8("Введите название"),
-                                 QString::fromUtf8("Новое название:"),
-                                 QLineEdit::Normal);
-    if (tree_->currentIndex().parent().row() == -1)
+    if (isAnySelected())
     {
-        qint64 currentTopLevelIndex = tree_->currentIndex().row();
-        getProject()->layerAt(currentTopLevelIndex)->setName(newName);
-    }
-    else
-    {
-        qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
-        qint64 currentSecondLevelIndex = tree_->currentIndex().row();
-        getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setName(newName);
+        QString newName = QInputDialog::getText(this,
+                                     QString::fromUtf8("Введите название"),
+                                     QString::fromUtf8("Новое название:"),
+                                     QLineEdit::Normal);
+        if (isLayerSelected())
+        {
+            qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
+            getProject()->layerAt(currentTopLevelIndex)->setName(newName);
+        }
+        else if (isObjectSelected())
+        {
+            qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
+            qint64 currentSecondLevelIndex = getCurrentSecondLevelIndex();
+            getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setName(newName);
+        }
     }
     update();
 }
@@ -162,8 +165,8 @@ void LayerDock::moreLayer()
     }
     else if (isObjectSelected())
     {
-        qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
-        qint64 currentSecondLevelIndex = tree_->currentIndex().row();
+        qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
+        qint64 currentSecondLevelIndex = getCurrentSecondLevelIndex();
         QString report = getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->report(*getProject()->getMap());
         QMessageBox::information(this, tr("Информация об объекте"),
                                  tr(report.toLocal8Bit().data()));
@@ -176,11 +179,11 @@ void LayerDock::moveUp()
     qint64 secondLevelIndex = getCurrentSecondLevelIndex();
     bool memLayerSelected = isLayerSelected();
     bool memObjectSelected = isObjectSelected();
-    if (tree_->currentIndex().parent().row() == -1)
+    if (memLayerSelected)
     {
         getProject()->moveUpLayer(topLevelIndex);
     }
-    else
+    else if (memObjectSelected)
     {
         getProject()->layerAt(topLevelIndex)->moveUp(secondLevelIndex);
     }
@@ -221,11 +224,11 @@ void LayerDock::moveDown()
     qint64 secondLevelIndex = getCurrentSecondLevelIndex();
     bool memLayerSelected = isLayerSelected();
     bool memObjectSelected = isObjectSelected();
-    if (isLayerSelected())
+    if (memLayerSelected)
     {
         getProject()->moveDownLayer(topLevelIndex);
     }
-    else
+    else if (memObjectSelected)
     {
         getProject()->layerAt(topLevelIndex)->moveDown(secondLevelIndex);
     }

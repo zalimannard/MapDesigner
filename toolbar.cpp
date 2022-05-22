@@ -43,6 +43,9 @@ ToolBar::ToolBar(Project* project)
     styleChooserAct = new QAction(QIcon::fromTheme("color-management"), tr("Редактировать текущий стиль"), this);
     connect(styleChooserAct, SIGNAL(triggered()), this, SLOT(setCursorStyleChooser()));
 
+    windDirectionAct = new QAction(QIcon::fromTheme("kstars_fitsviewer"), tr("Указать направление ветра"), this);
+    connect(windDirectionAct, SIGNAL(triggered()), this, SLOT(setCursorWindDirection()));
+
     setMovable(true);
     setEnabled(true);
     addAction(defaultCursorAct);
@@ -57,6 +60,7 @@ ToolBar::ToolBar(Project* project)
     addAction(bindingCursorAct);
     addAction(earthPointAct);
     addAction(styleChooserAct);
+    addAction(windDirectionAct);
 }
 
 bool ToolBar::isProjectExist()
@@ -176,6 +180,11 @@ void ToolBar::setCursorBinding()
 void ToolBar::setCursorEarthPoint()
 {
     setCursorType(CursorType::EARTH_POINT);
+}
+
+void ToolBar::setCursorWindDirection()
+{
+    setCursorType(CursorType::WIND);
 }
 
 void ToolBar::setCursorStyleChooser()

@@ -17,7 +17,8 @@ enum CursorType
     TEXT,
     INFECTION,
     BINDING,
-    EARTH_POINT
+    EARTH_POINT,
+    WIND
 };
 
 class ToolBar : public QToolBar
@@ -42,9 +43,11 @@ public:
     QAction *bindingCursorAct;
     QAction *earthPointAct;
     QAction *styleChooserAct;
+    QAction *windDirectionAct;
+
+    void setCursorType(CursorType value);
 
 private slots:
-    void setCursorType(CursorType value);
     void setCursorDefault();
     void setCursorMoveMap();
     void setCursorMoveObject();
@@ -57,6 +60,7 @@ private slots:
     void setCursorBinding();
     void setCursorEarthPoint();
     void setCursorStyleChooser();
+    void setCursorWindDirection();
 
 private:
     Project* project_;

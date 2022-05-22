@@ -28,12 +28,12 @@ QString InfectionZone::report(const Map &map) const
 
 bool InfectionZone::isHealthy() const
 {
-
+    return (points_.size() == 1);
 }
 
 bool InfectionZone::isMaximumPoint() const
 {
-
+    return (points_.size() == 1);
 }
 
 void InfectionZone::draw(QPixmap &pixmap) const

@@ -17,6 +17,8 @@ public:
     void moveUp(const qint64 &index);
     void moveDown(const qint64 &index);
 
+    bool isHealthy() const override;
+    bool isMaximumPoint() const override;
     void draw(QPixmap &pixmap) const override;
 
     virtual Layer* clone() const;

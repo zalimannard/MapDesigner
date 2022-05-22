@@ -311,7 +311,6 @@ qint64 LayerDock::getCurrentSecondLevelIndex()
 
 void LayerDock::update()
 {
-
     tree_->clear();
     for (int i = 0; i < getProject()->layerSize(); ++i)
     {

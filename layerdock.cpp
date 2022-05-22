@@ -7,9 +7,10 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-LayerDock::LayerDock(Project* project)
+LayerDock::LayerDock(Project* project, MapLabel* imageLabel)
 {
     setProject(project);
+    setImageLabel(imageLabel);
 
     QPushButton *addLayerBtn = new QPushButton();
     addLayerBtn->setIcon(QIcon::fromTheme("list-add"));
@@ -74,6 +75,7 @@ void LayerDock::addLayer()
     update();
     QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex));
     tree_->setCurrentItem(newSelectedLayer);
+    imageLabel_->repaint(getProject());
 }
 
 void LayerDock::deleteLayer()
@@ -113,6 +115,7 @@ void LayerDock::deleteLayer()
             tree_->setCurrentItem(newSelectedLayer);
         }
     }
+    imageLabel_->repaint(getProject());
 }
 
 void LayerDock::toggleVisibleLayer()
@@ -131,6 +134,7 @@ void LayerDock::toggleVisibleLayer()
         getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->setVisible(!currentVisible);
     }
     update();
+    imageLabel_->repaint(getProject());
 }
 
 void LayerDock::renameLayer()
@@ -154,6 +158,7 @@ void LayerDock::renameLayer()
         }
     }
     update();
+    imageLabel_->repaint(getProject());
 }
 
 void LayerDock::moreLayer()
@@ -171,6 +176,7 @@ void LayerDock::moreLayer()
         QMessageBox::information(this, tr("Информация об объекте"),
                                  tr(report.toLocal8Bit().data()));
     }
+    imageLabel_->repaint(getProject());
 }
 
 void LayerDock::moveUp()
@@ -216,6 +222,7 @@ void LayerDock::moveUp()
             tree_->setCurrentItem(newSelectedObject);
         }
     }
+    imageLabel_->repaint(getProject());
 }
 
 void LayerDock::moveDown()
@@ -263,6 +270,7 @@ void LayerDock::moveDown()
             tree_->setCurrentItem(newSelectedObject);
         }
     }
+    imageLabel_->repaint(getProject());
 }
 
 bool LayerDock::isAnySelected()
@@ -355,4 +363,14 @@ Project* LayerDock::getProject()
 void LayerDock::setProject(Project* value)
 {
     project_ = value;
+}
+
+MapLabel* LayerDock::getImageLabel()
+{
+    return imageLabel_;
+}
+
+void LayerDock::setImageLabel(MapLabel* value)
+{
+    imageLabel_ = value;
 }

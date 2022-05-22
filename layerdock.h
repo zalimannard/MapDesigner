@@ -4,13 +4,14 @@
 #include <QDockWidget>
 #include <QTreeWidget>
 
+#include "maplabel.h"
 #include "project.h"
 
 class LayerDock : public QDockWidget
 {
     Q_OBJECT
 public:
-    LayerDock(Project* project);
+    LayerDock(Project* project, MapLabel* imageLabel);
 
     void update();
 
@@ -32,10 +33,13 @@ public slots:
 
 private:
     Project* project_;
+    MapLabel* imageLabel_;
     QTreeWidget *tree_ = new QTreeWidget();
 
     Project* getProject();
     void setProject(Project* value);
+    MapLabel* getImageLabel();
+    void setImageLabel(MapLabel* value);
 
 };
 

@@ -18,6 +18,7 @@ SOURCES += \
     layeritem.cpp \
     main.cpp \
     map.cpp \
+    maplabel.cpp \
     myscrollarea.cpp \
     point.cpp \
     polygon.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     layerdock.h \
     layeritem.h \
     map.h \
+    maplabel.h \
     myscrollarea.h \
     point.h \
     polygon.h \

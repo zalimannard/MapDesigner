@@ -24,16 +24,16 @@
 Viewer::Viewer(QWidget *parent)
     : QMainWindow(parent)
 {
-    imageLabel = new QLabel;
-    imageLabel->setBackgroundRole(QPalette::Base);
-    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    imageLabel->setScaledContents(true);
+    imageLabel_ = new MapLabel;
+    imageLabel_->setBackgroundRole(QPalette::Base);
+    imageLabel_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    imageLabel_->setScaledContents(true);
 
-    scrollArea = new MyScrollArea;
-    scrollArea->setBackgroundRole(QPalette::Dark);
-    scrollArea->setAlignment(Qt::AlignCenter);
-    scrollArea->setWidget(imageLabel);
-    setCentralWidget(scrollArea);
+    scrollArea_ = new MyScrollArea;
+    scrollArea_->setBackgroundRole(QPalette::Dark);
+    scrollArea_->setAlignment(Qt::AlignCenter);
+    scrollArea_->setWidget(imageLabel_);
+    setCentralWidget(scrollArea_);
 
     createActions();
     createMenus();
@@ -46,13 +46,13 @@ Viewer::Viewer(QWidget *parent)
     QString projectName = projectFilePath.split("/").last().split(".").first();
     QString projectDirPath = projectFilePath.remove(projectFilePath.lastIndexOf("/"), projectFilePath.split("/").last().length() + 1);
     project_ = new Project(projectName);
-    project_->open(projectDirPath);
+    getProject()->open(projectDirPath);
     updateActions();
     updateToolbar();
 
-    repaint();
+    imageLabel_->repaint(getProject());
 
-    if (project_->isMapExist())
+    if (getProject()->isMapExist())
     {
         createLayerDock();
     }
@@ -186,21 +186,21 @@ void Viewer::createMenus()
 
 void Viewer::createToolbar()
 {
-    if (toolBar == nullptr)
+    if (toolBar_ == nullptr)
     {
-        toolBar = new ToolBar(project_);
-        addToolBar(Qt::LeftToolBarArea, toolBar);
-        toolBar->setVisible(true);
+        toolBar_ = new ToolBar(project_);
+        addToolBar(Qt::LeftToolBarArea, toolBar_);
+        toolBar_->setVisible(true);
     }
 }
 
 void Viewer::createLayerDock()
 {
-    if (layerDock == nullptr)
+    if (layerDock_ == nullptr)
     {
-        layerDock = new LayerDock(project_);
-        addDockWidget(Qt::RightDockWidgetArea, layerDock);
-        layerDock->setVisible(true);
+        layerDock_ = new LayerDock(project_, imageLabel_);
+        addDockWidget(Qt::RightDockWidgetArea, layerDock_);
+        layerDock_->setVisible(true);
     }
 }
 
@@ -211,42 +211,32 @@ void Viewer::updateActions()
 
 void Viewer::updateToolbar()
 {
-    removeToolBar(toolBar);
-    toolBar = new ToolBar(project_);
-    addToolBar(Qt::LeftToolBarArea, toolBar);
-    toolBar->setVisible(toolsAct->isChecked());
-}
-
-void Viewer::repaint()
-{
-    if (isProjectExist())
-    {
-        if (getProject()->isMapExist())
-        {
-            QPixmap pixmap;
-            getProject()->draw(pixmap);
-
-            imageLabel->setPixmap(pixmap);
-            imageLabel->resize(pixmap.width() * scaleFactor_, pixmap.height() * scaleFactor_);
-        }
-    }
+    removeToolBar(toolBar_);
+    toolBar_ = new ToolBar(project_);
+    addToolBar(Qt::LeftToolBarArea, toolBar_);
+    toolBar_->setVisible(toolsAct->isChecked());
 }
 
 void Viewer::endPainting()
 {
-    if (lastLayerItem != nullptr)
+    if (lastLayerItem_ != nullptr)
     {
-        if (!lastLayerItem->isHealthy())
+        if (!lastLayerItem_->isHealthy())
         {
-            getProject()->layerAt(layerDock->getCurrentTopLevelIndex())->remove(layerDock->getCurrentSecondLevelIndex());
+            getProject()->layerAt(layerDock_->getCurrentTopLevelIndex())->remove(layerDock_->getCurrentSecondLevelIndex());
         }
-        layerDock->update();
+        layerDock_->update();
     }
 }
 
 Project* Viewer::getProject()
 {
     return project_;
+}
+
+MapLabel* Viewer::getImageLabel()
+{
+    return imageLabel_;
 }
 
 void Viewer::createProject()
@@ -282,7 +272,7 @@ void Viewer::createProject()
     }
     updateActions();
     updateToolbar();
-    repaint();
+    imageLabel_->repaint(getProject());
 }
 
 void Viewer::openProject()
@@ -292,11 +282,11 @@ void Viewer::openProject()
     QString projectName = projectFilePath.split("/").last().split(".").first();
     QString projectDirPath = projectFilePath.remove(projectFilePath.lastIndexOf("/"), projectFilePath.split("/").last().length() + 1);
     project_ = new Project(projectName);
-    project_->open(projectDirPath);
+    getProject()->open(projectDirPath);
     updateActions();
     updateToolbar();
-    repaint();
-    if (project_->isMapExist())
+    imageLabel_->repaint(getProject());
+    if (getProject()->isMapExist())
     {
         createLayerDock();
     }
@@ -346,11 +336,11 @@ void Viewer::selectMap()
     {
         QString mapPath = QFileDialog::getOpenFileName(
                     this, tr("Выбрать карту"), QDir::currentPath(), tr("Image (*.jpg *.png *.gif)"));
-        project_->setMap(mapPath);
+        getProject()->setMap(mapPath);
 
         createLayerDock();
         updateActions();
-        repaint();
+        imageLabel_->repaint(getProject());
     }
 }
 
@@ -361,27 +351,28 @@ void Viewer::exit()
 
 void Viewer::zoomIn()
 {
-    scaleFactor_ *= 1.2;
-    repaint();
+    imageLabel_->setScaleFactor(imageLabel_->getScaleFactor() * 1.2);
+    imageLabel_->repaint(getProject());
 }
 
 void Viewer::zoomOut()
 {
-    scaleFactor_ /= 1.2;
-    repaint();
+    imageLabel_->setScaleFactor(imageLabel_->getScaleFactor() / 1.2);
+    imageLabel_->repaint(getProject());
 }
 
 void Viewer::normalSize()
 {
-    scaleFactor_ = 1;
-    repaint();
+    imageLabel_->setScaleFactor(1);
+    imageLabel_->repaint(getProject());
 }
 
 void Viewer::fitSize()
 {
     QImage image(getProject()->getMap()->getPathToImage());
-    scaleFactor_ = qMin((qreal)scrollArea->height() / image.height(), (qreal)scrollArea->width() / image.width());
-    repaint();
+    imageLabel_->setScaleFactor(qMin((qreal)scrollArea_->height() / image.height(),
+                                    (qreal)scrollArea_->width() / image.width()));
+    imageLabel_->repaint(getProject());
 }
 
 void Viewer::createTable()
@@ -422,8 +413,8 @@ void Viewer::aboutProgram()
 
 Point Viewer::getMousePointOnImage(QMouseEvent *event)
 {
-    return Point((event->pos().x() - scrollArea->geometry().x() - imageLabel->pos().x()) / scaleFactor_,
-                 (event->pos().y() - scrollArea->geometry().y() - imageLabel->pos().y()) / scaleFactor_);
+    return Point((event->pos().x() - scrollArea_->geometry().x() - imageLabel_->pos().x()) / imageLabel_->getScaleFactor(),
+                 (event->pos().y() - scrollArea_->geometry().y() - imageLabel_->pos().y()) / imageLabel_->getScaleFactor());
 }
 
 void Viewer::messageNoLayerSelected()
@@ -436,15 +427,15 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 {
     if (this->isProjectExist())
     {
-        if (project_->isMapExist())
+        if (getProject()->isMapExist())
         {
             switch (event->button())
             {
                 case Qt::LeftButton:
                 {
-                    qint64 currentTopLevelIndex = layerDock->getCurrentTopLevelIndex();
+                    qint64 currentTopLevelIndex = layerDock_->getCurrentTopLevelIndex();
 
-                    if (lastCursorType_ != toolBar->getCursorType())
+                    if (lastCursorType_ != toolBar_->getCursorType())
                     {
                         drawingMode_ = false;
                         endPainting();
@@ -456,11 +447,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                     }
                     else if (drawingMode_)
                     {
-                        lastPoint_ = lastLayerItem->appendPoint(getMousePointOnImage(event));
+                        lastPoint_ = lastLayerItem_->appendPoint(getMousePointOnImage(event));
                     }
                     else
                     {
-                        switch (toolBar->getCursorType())
+                        switch (toolBar_->getCursorType())
                         {
                             case CursorType::DEFAULT:
                                 break;
@@ -470,11 +461,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 break;
                             case CursorType::POLYLINE:
                             {
-                                if (layerDock->isAnySelected())
+                                if (layerDock_->isAnySelected())
                                 {
                                     Polyline* polyline = new Polyline(getMousePointOnImage(event));
                                     polyline->setStyle(*getProject()->getStyle());
-                                    lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(polyline);
+                                    lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(polyline);
                                     drawingMode_ = true;
                                 }
                                 else
@@ -485,11 +476,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             }
                             case CursorType::CIRCLE:
                             {
-                                if (layerDock->isAnySelected())
+                                if (layerDock_->isAnySelected())
                                 {
                                     Circle* circle = new Circle(getMousePointOnImage(event));
                                     circle->setStyle(*getProject()->getStyle());
-                                    lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(circle);
+                                    lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(circle);
                                     drawingMode_ = true;
                                 }
                                 else
@@ -500,11 +491,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             }
                             case CursorType::RECTANGLE:
                             {
-                                if (layerDock->isAnySelected())
+                                if (layerDock_->isAnySelected())
                                 {
                                     Rectangle* rectangle = new Rectangle(getMousePointOnImage(event));
                                     rectangle->setStyle(*getProject()->getStyle());
-                                    lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(rectangle);
+                                    lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(rectangle);
                                     drawingMode_ = true;
                                 }
                                 else
@@ -515,11 +506,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             }
                             case CursorType::POLYGON:
                             {
-                                if (layerDock->isAnySelected())
+                                if (layerDock_->isAnySelected())
                                 {
                                     Polygon* polygon = new Polygon(getMousePointOnImage(event));
                                     polygon->setStyle(*getProject()->getStyle());
-                                    lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(polygon);
+                                    lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(polygon);
                                     drawingMode_ = true;
                                 }
                                 else
@@ -530,11 +521,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             }
                             case CursorType::TEXT:
                             {
-                                if (layerDock->isAnySelected())
+                                if (layerDock_->isAnySelected())
                                 {
                                     Text* text = new Text(getMousePointOnImage(event));
                                     text->setStyle(*getProject()->getStyle());
-                                    lastLayerItem = getProject()->layerAt(currentTopLevelIndex)->push(text);
+                                    lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(text);
                                     drawingMode_ = true;
                                 }
                                 else
@@ -583,7 +574,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             default:
                                 break;
                         }
-                        lastCursorType_ = toolBar->getCursorType();
+                        lastCursorType_ = toolBar_->getCursorType();
                     }
                     break;
                 }
@@ -596,7 +587,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                     break;
                 }
             }
-            repaint();
+            imageLabel_->repaint(getProject());
         }
     }
 }
@@ -609,7 +600,7 @@ void Viewer::mouseDoubleClickEvent(QMouseEvent *event)
         endPainting();
     }
     lastPoint_ = nullptr;
-    repaint();
+    imageLabel_->repaint(getProject());
 }
 
 void Viewer::mouseMoveEvent(QMouseEvent *event)
@@ -620,7 +611,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         lastPoint_->setX(point.getX());
         lastPoint_->setY(point.getY());
     }
-    repaint();
+    imageLabel_->repaint(getProject());
 }
 
 void Viewer::mouseReleaseEvent(QMouseEvent *event)
@@ -632,7 +623,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             windMode_ = false;
             lastPoint_ = nullptr;
             endPainting();
-            toolBar->setCursorType(CursorType::DEFAULT);
+            toolBar_->setCursorType(CursorType::DEFAULT);
             getProject()->getMap()->getWind()->setApplied(true);
             qreal windSpeed = QInputDialog::getDouble(this,
                                                       QString::fromUtf8("Введите скорость ветра"),
@@ -643,21 +634,21 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     }
     else if (drawingMode_)
     {
-        if (lastLayerItem->isMaximumPoint())
+        if (lastLayerItem_->isMaximumPoint())
         {
             drawingMode_ = false;
             lastPoint_ = nullptr;
             endPainting();
         }
     }
-    repaint();
+    imageLabel_->repaint(getProject());
 }
 
 void Viewer::wheelEvent(QWheelEvent *event)
 {
     if (this->isProjectExist())
     {
-        if (project_->isMapExist())
+        if (getProject()->isMapExist())
         {
             QPoint numDegrees = event->angleDelta() / 8;
 

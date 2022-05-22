@@ -18,6 +18,7 @@
 #include "polyline.h"
 #include "layerdock.h"
 #include "toolbar.h"
+#include "maplabel.h"
 
 class Viewer : public QMainWindow
 {
@@ -32,9 +33,9 @@ private:
     bool windMode_ = false;
     Point* lastPoint_ = nullptr;
     Project* project_ = nullptr;
-    LayerItem* lastLayerItem = nullptr;
+    LayerItem* lastLayerItem_ = nullptr;
     CursorType lastCursorType_ = CursorType::DEFAULT;
-    Style currentStyle;
+    Style currentStyle_;
 
     void createActions();
     void createMenus();
@@ -46,18 +47,17 @@ private:
 
     void scaleImage(qreal factor);
     void adjustScrollBar(QScrollBar *scrollBar, qreal factor);
-    ToolBar *toolBar = nullptr;
-    LayerDock *layerDock = nullptr;
+    ToolBar *toolBar_ = nullptr;
+    LayerDock *layerDock_ = nullptr;
 
     Point getMousePointOnImage(QMouseEvent *event);
-    void repaint();
     void endPainting();
 
     Project* getProject();
+    MapLabel* getImageLabel();
 
-    QLabel *imageLabel;
-    MyScrollArea *scrollArea;
-    qreal scaleFactor_ = 1.0;
+    MapLabel *imageLabel_;
+    MyScrollArea *scrollArea_;
 
     QAction *createProjectAct;
     QAction *openProjectAct;

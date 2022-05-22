@@ -47,9 +47,9 @@ qreal Rectangle::square(const Map &map) const
     return square;
 }
 
-QStringList Rectangle::report(const Map &map) const
+QString Rectangle::report(const Map &map) const
 {
-    QStringList reportText = LayerItem::report(map);
+    QString reportText = LayerItem::report(map);
 
     return reportText;
 }

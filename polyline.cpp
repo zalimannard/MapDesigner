@@ -23,9 +23,9 @@ qreal Polyline::square(const Map &map) const
     return 0.0;
 }
 
-QStringList Polyline::report(const Map &map) const
+QString Polyline::report(const Map &map) const
 {
-    QStringList reportText = LayerItem::report(map);
+    QString reportText = LayerItem::report(map);
 
     return reportText;
 }

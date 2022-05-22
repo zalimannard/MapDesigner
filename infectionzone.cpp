@@ -20,10 +20,10 @@ qreal InfectionZone::square(const Map &map) const
     return 0.0;
 }
 
-QStringList InfectionZone::report(const Map &map) const
+QString InfectionZone::report(const Map &map) const
 {
     // TODO
-    return QStringList("TODO");
+    return "TODO";
 }
 
 bool InfectionZone::isHealthy() const

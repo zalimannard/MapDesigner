@@ -13,7 +13,7 @@ public:
 
     virtual qreal perimeter(const Map &map) const = 0;
     virtual qreal square(const Map &map) const = 0;
-    virtual QStringList report(const Map &map) const;
+    virtual QString report(const Map &map) const;
     virtual bool isHealthy() const = 0;
     virtual bool isMaximumPoint() const = 0;
 

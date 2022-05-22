@@ -42,10 +42,10 @@ qreal Circle::square(const Map &map) const
     }
 }
 
-QStringList Circle::report(const Map &map) const
+QString Circle::report(const Map &map) const
 {
-    QStringList reportText = LayerItem::report(map);
-    reportText.append("Радиус: " + QString::number(radius(map)));
+    QString reportText = LayerItem::report(map);
+    reportText.append("\nРадиус: " + QString::number(radius(map)));
 
     return reportText;
 }

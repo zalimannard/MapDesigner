@@ -25,9 +25,9 @@ qreal Polygon::square(const Map &map) const
     return 0;
 }
 
-QStringList Polygon::report(const Map &map) const
+QString Polygon::report(const Map &map) const
 {
-    QStringList reportText = LayerItem::report(map);
+    QString reportText = LayerItem::report(map);
 
     return reportText;
 }

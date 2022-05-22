@@ -18,9 +18,9 @@ qreal Text::square(const Map &map) const
     return 0.0;
 }
 
-QStringList Text::report(const Map &map) const
+QString Text::report(const Map &map) const
 {
-    QStringList reportText = LayerItem::report(map);
+    QString reportText = LayerItem::report(map);
 
     return reportText;
 }

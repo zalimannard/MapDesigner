@@ -26,7 +26,7 @@ public slots:
     void deleteLayer();
     void toggleVisibleLayer();
     void renameLayer();
-    void moreLayer(Map &map);
+    void moreLayer();
     void moveUp();
     void moveDown();
 

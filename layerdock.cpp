@@ -153,7 +153,7 @@ void LayerDock::renameLayer()
     update();
 }
 
-void LayerDock::moreLayer(Map &map)
+void LayerDock::moreLayer()
 {
     if (isLayerSelected())
     {
@@ -164,8 +164,9 @@ void LayerDock::moreLayer(Map &map)
     {
         qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
         qint64 currentSecondLevelIndex = tree_->currentIndex().row();
-//        QMessageBox::information(this, tr("Предупреждение"),
-//                              tr(getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->report(map)));
+        QString report = getProject()->layerAt(currentTopLevelIndex)->at(currentSecondLevelIndex)->report(*getProject()->getMap());
+        QMessageBox::information(this, tr("Информация об объекте"),
+                                 tr(report.toLocal8Bit().data()));
     }
 }
 

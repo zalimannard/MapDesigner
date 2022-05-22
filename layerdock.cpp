@@ -172,34 +172,94 @@ void LayerDock::moreLayer()
 
 void LayerDock::moveUp()
 {
+    qint64 topLevelIndex = getCurrentTopLevelIndex();
+    qint64 secondLevelIndex = getCurrentSecondLevelIndex();
+    bool memLayerSelected = isLayerSelected();
+    bool memObjectSelected = isObjectSelected();
     if (tree_->currentIndex().parent().row() == -1)
     {
-        qint64 currentTopLevelIndex = tree_->currentIndex().row();
-        getProject()->moveUpLayer(currentTopLevelIndex);
+        getProject()->moveUpLayer(topLevelIndex);
     }
     else
     {
-        qint64 currentTopLevelIndex = tree_->currentIndex().parent().row();
-        qint64 currentSecondLevelIndex = tree_->currentIndex().row();
-        getProject()->layerAt(currentTopLevelIndex)->moveUp(currentSecondLevelIndex);
+        getProject()->layerAt(topLevelIndex)->moveUp(secondLevelIndex);
     }
     update();
+    if (memLayerSelected)
+    {
+        if (topLevelIndex > 0)
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex - 1));
+            tree_->setCurrentItem(newSelectedLayer);
+        }
+        else
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex));
+            tree_->setCurrentItem(newSelectedLayer);
+        }
+    }
+    else if (memObjectSelected)
+    {
+        if (secondLevelIndex > 0)
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex));
+            QTreeWidgetItem* newSelectedObject = newSelectedLayer->child(qMax((qint64) 0, secondLevelIndex - 1));
+            tree_->setCurrentItem(newSelectedObject);
+        }
+        else
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex));
+            QTreeWidgetItem* newSelectedObject = newSelectedLayer->child(qMax((qint64) 0, secondLevelIndex));
+            tree_->setCurrentItem(newSelectedObject);
+        }
+    }
 }
 
 void LayerDock::moveDown()
 {
+    qint64 topLevelIndex = getCurrentTopLevelIndex();
+    qint64 secondLevelIndex = getCurrentSecondLevelIndex();
+    bool memLayerSelected = isLayerSelected();
+    bool memObjectSelected = isObjectSelected();
     if (isLayerSelected())
     {
-        qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
-        getProject()->moveDownLayer(currentTopLevelIndex);
+        getProject()->moveDownLayer(topLevelIndex);
     }
     else
     {
-        qint64 currentTopLevelIndex = getCurrentTopLevelIndex();
-        qint64 currentSecondLevelIndex = getCurrentSecondLevelIndex();
-        getProject()->layerAt(currentTopLevelIndex)->moveDown(currentSecondLevelIndex);
+        getProject()->layerAt(topLevelIndex)->moveDown(secondLevelIndex);
     }
     update();
+    if (memLayerSelected)
+    {
+        qint64 numberOfLayer = tree_->topLevelItemCount();
+        if (topLevelIndex < numberOfLayer - 1)
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex + 1));
+            tree_->setCurrentItem(newSelectedLayer);
+        }
+        else
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex));
+            tree_->setCurrentItem(newSelectedLayer);
+        }
+    }
+    else if (memObjectSelected)
+    {
+        qint64 numberOfObjectOnLayer = tree_->topLevelItem(topLevelIndex)->childCount();
+        if (secondLevelIndex < numberOfObjectOnLayer - 1)
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(qMax((qint64) 0, topLevelIndex));
+            QTreeWidgetItem* newSelectedObject = newSelectedLayer->child(qMax((qint64) 0, secondLevelIndex + 1));
+            tree_->setCurrentItem(newSelectedObject);
+        }
+        else
+        {
+            QTreeWidgetItem* newSelectedLayer = tree_->topLevelItem(topLevelIndex);
+            QTreeWidgetItem* newSelectedObject = newSelectedLayer->child(secondLevelIndex);
+            tree_->setCurrentItem(newSelectedObject);
+        }
+    }
 }
 
 bool LayerDock::isAnySelected()

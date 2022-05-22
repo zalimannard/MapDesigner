@@ -556,7 +556,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 qreal latitude = QInputDialog::getDouble(0,
                                                                         "Ввод",
                                                                         "Широта:",
-                                                                        QLineEdit::Normal);
+                                                                        QLineEdit::Normal, 0, 360, 4);
                                 getProject()->getMap()->addPoint(getMousePointOnImage(event), Point(longitude, latitude));
                                 break;
                             }
@@ -634,6 +634,11 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             endPainting();
             toolBar->setCursorType(CursorType::DEFAULT);
             getProject()->getMap()->getWind()->setApplied(true);
+            qreal windSpeed = QInputDialog::getDouble(this,
+                                                      QString::fromUtf8("Введите скорость ветра"),
+                                                      QString::fromUtf8("Скорость ветра"),
+                                                      0, 0, 1000, 2);
+            getProject()->getMap()->getWind()->setSpeed(windSpeed);
         }
     }
     else if (drawingMode_)

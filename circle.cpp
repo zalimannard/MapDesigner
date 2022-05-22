@@ -69,7 +69,6 @@ void Circle::draw(QPixmap &pixmap) const
         painter->drawEllipse(points_.at(0).getX(), points_.at(0).getY(),
                              points_.at(1).getX() - points_.at(0).getX(),
                              points_.at(1).getY() - points_.at(0).getY());
-
         delete painter;
     }
 }

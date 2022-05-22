@@ -16,9 +16,12 @@ public:
     bool isApplied() const;
     void setApplied(bool value);
     qreal getDegreesDuration() const;
+    qreal getSpeed() const;
+    void setSpeed(qreal value);
 
 private:
     bool applied_ = true;
+    qreal speed_ = 0.0;
 };
 
 #endif // WIND_H

@@ -1,6 +1,7 @@
-#include <QtMath>
-
 #include "map.h"
+
+#include <QtMath>
+#include <QPainter>
 
 Map::Map(const QString &pathToImage) :
     ImageObject(Point(0.0, 0.0), "Карта", "")
@@ -111,4 +112,40 @@ void Map::draw(QPixmap &pixmap) const
     QImage image(getPathToImage());
     pixmap = QPixmap::fromImage(image);
     wind_->draw(pixmap);
+
+    QPainter *painter = new QPainter(&pixmap);
+    QPen pen;
+    pen.setColor(QColor(24, 26, 30, 240));
+    pen.setWidth(36);
+    painter->setPen(pen);
+    QBrush brush;
+    brush.setColor(QColor(24, 26, 30, 240));
+    painter->setBrush(brush);
+    for (QPair<Point, Point> mapPairPoint : points_)
+    {
+        painter->drawLine(mapPairPoint.first.getX() + 6,
+                          mapPairPoint.first.getY() - 28,
+                          mapPairPoint.first.getX() + 32,
+                          mapPairPoint.first.getY() - 28);
+    }
+
+    pen.setColor(QColor(236, 130, 130, 200));
+    pen.setWidth(6);
+    painter->setPen(pen);
+    brush.setColor(QColor(236, 130, 130, 200));
+    painter->setBrush(brush);
+    for (QPair<Point, Point> mapPairPoint : points_)
+    {
+        painter->drawEllipse(mapPairPoint.first.getX() - 3,
+                             mapPairPoint.first.getY() - 3, 4, 4);
+        painter->drawText(mapPairPoint.first.getX() - 6,
+                          mapPairPoint.first.getY() - 30,
+                          QString("Д: ") +
+                          QString::number(minuteEarthToEarth(mapPairPoint.second.getX())));
+        painter->drawText(mapPairPoint.first.getX() - 6,
+                          mapPairPoint.first.getY() - 14,
+                          QString("Ш: ") +
+                          QString::number(minuteEarthToEarth(mapPairPoint.second.getY())));
+    }
+    delete painter;
 }

@@ -22,7 +22,7 @@ ToolBar::ToolBar(Project* project)
     circleCursorAct = new QAction(QIcon::fromTheme("draw-circle"), tr("Рисовать окружность"), this);
     connect(circleCursorAct, SIGNAL(triggered()), this, SLOT(setCursorCircle()));
 
-    rectangleCursorAct = new QAction(QIcon::fromTheme("draw-rectangle"), tr("Рисовать прямоугольник"), this);
+    rectangleCursorAct = new QAction(QIcon::fromTheme("draw-rectangle"), tr("Рисовать параллелограмм"), this);
     connect(rectangleCursorAct, SIGNAL(triggered()), this, SLOT(setCursorRectangle()));
 
     polygonCursorAct = new QAction(QIcon::fromTheme("draw-polygon"), tr("Рисовать полигон"), this);

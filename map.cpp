@@ -75,6 +75,18 @@ qreal Map::distance(const Point &imagePointFirst, const Point &imagePointSecond)
                 qPow(qSin((lambda2 - lambda1) / 2), 2)));
 }
 
+qreal Map::getMeterPerPixelX() const
+{
+    Point thirdPoint(points_.at(0).first.getX(), points_.at(1).first.getY());
+    return distance(thirdPoint, points_.at(1).first) / qAbs(thirdPoint.getX() - points_.at(1).first.getX());
+}
+
+qreal Map::getMeterPerPixelY() const
+{
+    Point thirdPoint(points_.at(0).first.getX(), points_.at(1).first.getY());
+    return distance(thirdPoint, points_.at(0).first) / qAbs(thirdPoint.getY() - points_.at(0).first.getY());
+}
+
 void Map::draw(QPixmap &pixmap) const
 {
     QImage image(getPathToImage());

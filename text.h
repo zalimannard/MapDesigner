@@ -12,7 +12,7 @@ public:
     Text(const Point &firstPoint, const QString &name = "Текст", const QString &description = "");
 
     qreal perimeter(const Map &map) const override;
-    qreal square(const Map &map) const override;
+    qreal area(const Map &map) const override;
     QString report(const Map &map) const override;
     bool isHealthy() const override;
     bool isMaximumPoint() const override;

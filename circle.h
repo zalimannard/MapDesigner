@@ -14,7 +14,7 @@ public:
     qreal radius(const Map &map) const;
 
     qreal perimeter(const Map &map) const override;
-    qreal square(const Map &map) const override;
+    qreal area(const Map &map) const override;
     QString report(const Map &map) const override;
     bool isHealthy() const override;
     bool isMaximumPoint() const override;

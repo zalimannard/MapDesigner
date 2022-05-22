@@ -16,6 +16,8 @@ public:
     void addPoint(const Point &imagePoint, const Point &earthPoint);
     Point imagePointToEarthPoint(const Point &imagePoint) const;
     qreal distance(const Point &first, const Point &second) const;
+    qreal getMeterPerPixelX() const;
+    qreal getMeterPerPixelY() const;
 
     void draw(QPixmap &pixmap) const override;
 

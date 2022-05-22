@@ -27,7 +27,7 @@ qreal Circle::perimeter(const Map &map) const
             qSqrt(((qPow(distanceX / 2, 2)) + qPow(distanceY / 2, 2)) / 2);
 }
 
-qreal Circle::square(const Map &map) const
+qreal Circle::area(const Map &map) const
 {
     Point thirdPoint(points_.at(0).getX(), points_.at(1).getY());
     qreal distanceX = map.distance(points_.at(1), thirdPoint);

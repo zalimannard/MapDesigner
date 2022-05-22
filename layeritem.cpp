@@ -19,6 +19,6 @@ QString LayerItem::report(const Map &map) const
     reportText.append("\n    Широта: " + QString::number(map.imagePointToEarthPoint(
                                                              Point(getPosition().getX(), getPosition().getY())).getY()));
     reportText.append("\nПериметр: " + QString::number(round(perimeter(map) / 10) / 100) + " км");
-    reportText.append("\nПлощадь: " + QString::number(round(square(map) / 10000) / 100) + " км^2");
+    reportText.append("\nПлощадь: " + QString::number(round(area(map) / 10000) / 100) + " км^2");
     return reportText;
 }

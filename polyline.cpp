@@ -18,7 +18,7 @@ qreal Polyline::perimeter(const Map &map) const
     return perimeter;
 }
 
-qreal Polyline::square(const Map &map) const
+qreal Polyline::area(const Map &map) const
 {
     return 0.0;
 }

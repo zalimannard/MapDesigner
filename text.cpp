@@ -13,7 +13,7 @@ qreal Text::perimeter(const Map &map) const
     return 0.0;
 }
 
-qreal Text::square(const Map &map) const
+qreal Text::area(const Map &map) const
 {
     return 0.0;
 }

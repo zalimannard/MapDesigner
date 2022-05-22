@@ -1,6 +1,5 @@
 #include <QPainter>
 #include <QPainterPath>
-
 #include "polygon.h"
 
 Polygon::Polygon(const Point &firstPoint, const QString &name, const QString &description)
@@ -14,15 +13,24 @@ qreal Polygon::perimeter(const Map &map) const
     qreal answer = 0.0;
     for (auto i = 0; i < points_.size(); ++i)
     {
-        answer = map.distance(points_.at(i), points_.at((i + 1) % points_.size()));
+        answer += map.distance(points_.at(i), points_.at((i + 1) % points_.size()));
     }
     return answer;
 }
 
-qreal Polygon::square(const Map &map) const
+qreal Polygon::area(const Map &map) const
 {
-    // TODO
-    return 0;
+    qreal areaPixel = 0;
+    for (auto i = 0; i < points_.size(); ++i)
+    {
+        Point p1 = points_.at(i);
+        Point p2 = points_.at((i + 1) % points_.size());
+        areaPixel += p1.getX() * p2.getY() - p2.getX() * p1.getY();
+    }
+    areaPixel = qAbs(areaPixel);
+    qreal meterPerPixelX = map.getMeterPerPixelX();
+    qreal meterPerPixelY = map.getMeterPerPixelY();
+    return areaPixel * meterPerPixelX * meterPerPixelY;
 }
 
 QString Polygon::report(const Map &map) const
@@ -70,28 +78,3 @@ LayerItem* Polygon::clone() const
 {
     return new Polygon(*this);
 }
-
-
-//qreal Polygon::calculatePerimeter() const
-//{
-//    qint64 answer = 0;
-////    for (auto i = 1; i < points.size(); ++i)
-////    {
-////        answer += points.at(i - 1).distance(points.at(i));
-////    }
-//    return answer;
-//}
-
-//qreal Polygon::calculateArea() const
-//{
-//    qreal earthArea = 510072000000000;
-//    qreal firstSum = 0;
-//    qreal secondSum = 0;
-////    for (auto i = 0; i < points.size(); ++i)
-////    {
-////        firstSum += points.at(i).getLatitude() * points.at((i + 1) % points.size()).getLongitude();
-////        secondSum += points.at(i).getLongitude() * points.at((i + 1) % points.size()).getLatitude();
-////    }
-//    qreal answer = earthArea / 41253 * (firstSum - secondSum);
-//    return answer;
-//}

@@ -29,22 +29,19 @@ qreal Rectangle::perimeter(const Map &map) const
     return perimeter;
 }
 
-qreal Rectangle::square(const Map &map) const
+qreal Rectangle::area(const Map &map) const
 {
-    qreal square = 0.0;
-    if (isHealthy())
+    qreal triangleAreaPixel = 0;
+    for (auto i = 0; i < points_.size(); ++i)
     {
-        if (points_.size() == 2)
-        {
-            square = 0.0;
-        }
-        else
-        {
-            square = map.distance(points_.at(0), points_.at(1)) *
-                    map.distance(points_.at(1), points_.at(2));
-        }
+        Point p1 = points_.at(i);
+        Point p2 = points_.at((i + 1) % points_.size());
+        triangleAreaPixel += p1.getX() * p2.getY() - p2.getX() * p1.getY();
     }
-    return square;
+    triangleAreaPixel = qAbs(triangleAreaPixel);
+    qreal meterPerPixelX = map.getMeterPerPixelX();
+    qreal meterPerPixelY = map.getMeterPerPixelY();
+    return 2 * triangleAreaPixel * meterPerPixelX * meterPerPixelY;
 }
 
 QString Rectangle::report(const Map &map) const

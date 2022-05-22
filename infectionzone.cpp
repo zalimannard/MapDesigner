@@ -15,7 +15,7 @@ qreal InfectionZone::perimeter(const Map &map) const
     return perimeter;
 }
 
-qreal InfectionZone::square(const Map &map) const
+qreal InfectionZone::area(const Map &map) const
 {
     return 0.0;
 }

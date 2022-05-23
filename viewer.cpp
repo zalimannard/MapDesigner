@@ -20,6 +20,7 @@
 #include "rectangle.h"
 #include "stylechooser.h"
 #include "text.h"
+#include "infectionzone.h"
 
 Viewer::Viewer(QWidget *parent)
     : QMainWindow(parent)
@@ -536,6 +537,24 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             }
                             case CursorType::INFECTION:
                             {
+                                if (layerDock_->isAnySelected())
+                                {
+                                    qreal weight = QInputDialog::getDouble(0,
+                                                                           "Сколько вещества выброшено?",
+                                                                           "Масса(т): ",
+                                                                           0, 0, 10000000, 2);
+                                    qreal time = QInputDialog::getDouble(0,
+                                                                           "Сколько прошло с аварии?",
+                                                                           "Время(ч): ",
+                                                                           0, 0, 10000000, 2);
+                                    InfectionZone* infectionZone = new InfectionZone(getMousePointOnImage(event), getProject()->getMap(), time, weight);
+                                    infectionZone->setStyle(*getProject()->getStyle());
+                                    getProject()->layerAt(currentTopLevelIndex)->push(infectionZone);
+                                }
+                                else
+                                {
+                                    messageNoLayerSelected();
+                                }
                                 break;
                             }
                             case CursorType::BINDING:
@@ -543,7 +562,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                 qreal longitude = QInputDialog::getDouble(0,
                                                                         "Ввод",
                                                                         "Долгота:",
-                                                                        QLineEdit::Normal);
+                                                                        QLineEdit::Normal, 0, 360, 4);
                                 qreal latitude = QInputDialog::getDouble(0,
                                                                         "Ввод",
                                                                         "Широта:",

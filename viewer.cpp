@@ -420,7 +420,8 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             {
                                 if (layerDock_->isAnySelected())
                                 {
-                                    Polyline* polyline = new Polyline(getMousePointOnImage(event));
+                                    QString name = QInputDialog::getText(nullptr, "Название", "Название");
+                                    Polyline* polyline = new Polyline(getMousePointOnImage(event), name);
                                     polyline->setStyle(*getProject()->getStyle());
                                     lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(polyline);
                                     drawingMode_ = true;
@@ -435,7 +436,8 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             {
                                 if (layerDock_->isAnySelected())
                                 {
-                                    Circle* circle = new Circle(getMousePointOnImage(event));
+                                    QString name = QInputDialog::getText(nullptr, "Название", "Название");
+                                    Circle* circle = new Circle(getMousePointOnImage(event), name);
                                     circle->setStyle(*getProject()->getStyle());
                                     lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(circle);
                                     drawingMode_ = true;
@@ -450,7 +452,8 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             {
                                 if (layerDock_->isAnySelected())
                                 {
-                                    Rectangle* rectangle = new Rectangle(getMousePointOnImage(event));
+                                    QString name = QInputDialog::getText(nullptr, "Название", "Название");
+                                    Rectangle* rectangle = new Rectangle(getMousePointOnImage(event), name);
                                     rectangle->setStyle(*getProject()->getStyle());
                                     lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(rectangle);
                                     drawingMode_ = true;
@@ -465,7 +468,8 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             {
                                 if (layerDock_->isAnySelected())
                                 {
-                                    Polygon* polygon = new Polygon(getMousePointOnImage(event));
+                                    QString name = QInputDialog::getText(nullptr, "Название", "Название");
+                                    Polygon* polygon = new Polygon(getMousePointOnImage(event), name);
                                     polygon->setStyle(*getProject()->getStyle());
                                     lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(polygon);
                                     drawingMode_ = true;
@@ -480,7 +484,8 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                             {
                                 if (layerDock_->isAnySelected())
                                 {
-                                    Text* text = new Text(getMousePointOnImage(event));
+                                    QString name = QInputDialog::getText(nullptr, "Содержимое", "Содержимое");
+                                    Text* text = new Text(getMousePointOnImage(event), name);
                                     text->setStyle(*getProject()->getStyle());
                                     lastLayerItem_ = getProject()->layerAt(currentTopLevelIndex)->push(text);
                                     drawingMode_ = true;
@@ -503,7 +508,8 @@ void Viewer::mousePressEvent(QMouseEvent *event)
                                                                            "Сколько прошло с аварии?",
                                                                            "Время(ч): ",
                                                                            0, 0, 10000000, 2);
-                                    InfectionZone* infectionZone = new InfectionZone(getMousePointOnImage(event), getProject()->getMap(), time, weight);
+                                    QString name = QInputDialog::getText(nullptr, "Название заражения", "Название заражения");
+                                    InfectionZone* infectionZone = new InfectionZone(getMousePointOnImage(event), getProject()->getMap(), time, weight, name);
                                     infectionZone->setStyle(*getProject()->getStyle());
                                     getProject()->layerAt(currentTopLevelIndex)->push(infectionZone);
                                 }

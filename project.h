@@ -2,6 +2,8 @@
 #define PROJECT_H
 
 #include <QString>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
 #include "layer.h"
 #include "map.h"
@@ -32,8 +34,11 @@ public:
     void setName(const QString &name);
     QString getPath() const;
     void setPath(const QString &path);
+    QSqlDatabase* getDb();
 
 private:
+    QSqlDatabase db;
+    QSqlQuery *query;
     QVector<Layer*> layers_;
     QString name_;
     QString path_;

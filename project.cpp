@@ -3,6 +3,7 @@
 #include <QImage>
 #include <QPixmap>
 #include <QMessageBox>
+#include <QDebug>
 
 #include "project.h"
 
@@ -50,6 +51,19 @@ void Project::open(const QString &path)
         }
     }
     file.close();
+
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(path + "/Objects.db");
+
+    if (db.open())
+    {
+        qDebug() << "open";
+    }
+    else
+    {
+        qDebug() << "close";
+    }
+    query = new QSqlQuery(db);
 }
 
 void Project::draw(QPixmap &pixmap) const
@@ -71,6 +85,7 @@ void Project::pushLayer(const Layer *layer)
 {
     Layer* newLayer = layer->clone();
     layers_.append(newLayer);
+    query->exec(QString("CREATE TABLE ") + layer->getName() + QString("(name TEXT, perimeter REAL, area REAL);"));
 }
 
 Layer* Project::layerAt(const qint64 &index)
@@ -80,6 +95,7 @@ Layer* Project::layerAt(const qint64 &index)
 
 void Project::removeLayer(const qint64 &index)
 {
+    query->exec(QString("DROP TABLE ") + layers_.at(index)->getName());
     layers_.remove(index);
 }
 
@@ -145,4 +161,9 @@ QString Project::getPath() const
 void Project::setPath(const QString &path)
 {
     this->path_ = path;
+}
+
+QSqlDatabase* Project::getDb()
+{
+    return &db;
 }

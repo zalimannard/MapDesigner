@@ -1,17 +1,23 @@
 #include <QtGlobal>
+#include <QTime>
 
 #include "layer.h"
 
-Layer::Layer(const QString &name, const QString &description) :
+Layer::Layer(QSqlDatabase *db, const QString &name, const QString &description) :
     DrawableObject(Point(0.0, 0.0), name, description)
 {
-
+    db_ = *db;
+    query = new QSqlQuery(db_);
 }
 
 LayerItem* Layer::push(const LayerItem *item)
 {
     LayerItem *copyItem = item->clone();
     items_.append(copyItem);
+    query->exec("INSERT INTO " + getName() + "(name, perimeter, area) VALUES ('" +
+                item->getName() + "', " +
+                QString::number((qreal) (QRandomGenerator::global()->generate() % 10000) / 100) + ", " +
+                QString::number((qreal) (QRandomGenerator::global()->generate() % 10000) / 100) + ")");
     return copyItem;
 }
 

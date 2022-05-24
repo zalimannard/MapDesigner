@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     circle.cpp \
+    database.cpp \
     drawableobject.cpp \
     imageobject.cpp \
     infectionzone.cpp \
@@ -35,6 +36,7 @@ SOURCES += \
 
 HEADERS += \
     circle.h \
+    database.h \
     drawableobject.h \
     imageobject.h \
     infectionzone.h \
@@ -62,4 +64,5 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-FORMS +=
+FORMS += \
+    database.ui

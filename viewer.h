@@ -12,6 +12,8 @@
 #include <QDockWidget>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
 #include "project.h"
 #include "myscrollarea.h"
@@ -71,9 +73,6 @@ private:
     QAction *normalSizeAct;
     QAction *fitSizeAct;
 
-    QAction *createTableAct;
-    QAction *openTableAct;
-    QAction *deleteTableAct;
     QAction *requestAct;
 
     QAction *layersAct;
@@ -111,9 +110,6 @@ private slots:
     void fitSize();
     void normalSize();
 
-    void createTable();
-    void openTable();
-    void deleteTable();
     void request();
 
     void layers();

@@ -15,6 +15,7 @@
 #include "viewer.h"
 #include "project.h"
 #include "circle.h"
+#include "database.h"
 #include "polyline.h"
 #include "polygon.h"
 #include "rectangle.h"
@@ -42,21 +43,6 @@ Viewer::Viewer(QWidget *parent)
 
     setWindowTitle(tr("Map Designer"));
     resize(1280, 720);
-
-    QString projectFilePath = "/home/zalimannard/Projects/MapDesignerTest/Example.mdp";
-    QString projectName = projectFilePath.split("/").last().split(".").first();
-    QString projectDirPath = projectFilePath.remove(projectFilePath.lastIndexOf("/"), projectFilePath.split("/").last().length() + 1);
-    project_ = new Project(projectName);
-    getProject()->open(projectDirPath);
-    updateActions();
-    updateToolbar();
-
-    imageLabel_->repaint(getProject());
-
-    if (getProject()->isMapExist())
-    {
-        createLayerDock();
-    }
 }
 
 Viewer::~Viewer()
@@ -107,18 +93,6 @@ void Viewer::createActions()
     connect(fitSizeAct, SIGNAL(triggered()), this, SLOT(fitSize()));
 
 
-    createTableAct = new QAction(tr("&Создать таблицу"), this);
-    createTableAct->setShortcut(tr("Ctrl+E"));
-    connect(createTableAct, SIGNAL(triggered()), this, SLOT(createTable()));
-
-    openTableAct = new QAction(tr("&Открыть таблицу"), this);
-    openTableAct->setShortcut(tr("Ctrl+P"));
-    connect(openTableAct, SIGNAL(triggered()), this, SLOT(openTable()));
-
-    deleteTableAct = new QAction(tr("&Удалить таблицу"), this);
-    deleteTableAct->setShortcut(tr("Ctrl+D"));
-    connect(deleteTableAct, SIGNAL(triggered()), this, SLOT(deleteTable()));
-
     requestAct = new QAction(tr("&Запрос"), this);
     requestAct->setShortcut(tr("Ctrl+R"));
     connect(requestAct, SIGNAL(triggered()), this, SLOT(request()));
@@ -163,9 +137,6 @@ void Viewer::createMenus()
     editMenu->addAction(fitSizeAct);
 
     tablesMenu = new QMenu(tr("&Таблица"), this);
-    tablesMenu->addAction(createTableAct);
-    tablesMenu->addAction(openTableAct);
-    tablesMenu->addAction(deleteTableAct);
     tablesMenu->addAction(requestAct);
 
 
@@ -199,7 +170,7 @@ void Viewer::createLayerDock()
 {
     if (layerDock_ == nullptr)
     {
-        layerDock_ = new LayerDock(project_, imageLabel_);
+        layerDock_ = new LayerDock(getProject()->getDb(), project_, imageLabel_);
         addDockWidget(Qt::RightDockWidgetArea, layerDock_);
         layerDock_->setVisible(true);
     }
@@ -376,24 +347,9 @@ void Viewer::fitSize()
     imageLabel_->repaint(getProject());
 }
 
-void Viewer::createTable()
-{
-
-}
-
-void Viewer::openTable()
-{
-
-}
-
-void Viewer::deleteTable()
-{
-
-}
-
 void Viewer::request()
 {
-
+    Database* databaseQuery = new Database(*getProject()->getDb());
 }
 
 void Viewer::layers()

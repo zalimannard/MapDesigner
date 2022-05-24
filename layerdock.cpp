@@ -6,11 +6,14 @@
 #include <QGroupBox>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
-LayerDock::LayerDock(Project* project, MapLabel* imageLabel)
+LayerDock::LayerDock(QSqlDatabase* db, Project* project, MapLabel* imageLabel)
 {
     setProject(project);
     setImageLabel(imageLabel);
+    db_ = *db;
 
     QPushButton *addLayerBtn = new QPushButton();
     addLayerBtn->setIcon(QIcon::fromTheme("list-add"));
@@ -69,7 +72,8 @@ LayerDock::LayerDock(Project* project, MapLabel* imageLabel)
 
 void LayerDock::addLayer()
 {
-    Layer* newLayer = new Layer();
+    QString name = QInputDialog::getText(nullptr, "Название слоя", "Название");
+    Layer* newLayer = new Layer(&db_, name);
     getProject()->pushLayer(newLayer);
     qint64 topLevelIndex = getCurrentTopLevelIndex();
     update();

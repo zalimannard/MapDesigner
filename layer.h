@@ -2,13 +2,17 @@
 #define LAYER_H
 
 #include <QVector>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QRandomGenerator>
+#include <QTime>
 
 #include "layeritem.h"
 
 class Layer : public DrawableObject
 {
 public:
-    Layer(const QString &name = "Новый слой", const QString &description = "");
+    Layer(QSqlDatabase *db, const QString &name = "Новый слой", const QString &description = "");
 
     LayerItem* push(const LayerItem *item);
     LayerItem* at(const qint64 &index);
@@ -24,6 +28,8 @@ public:
     virtual Layer* clone() const;
 
 private:
+    QSqlDatabase db_;
+    QSqlQuery *query;
     QVector<LayerItem *> items_;
 };
 

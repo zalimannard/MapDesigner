@@ -11,7 +11,7 @@ class LayerDock : public QDockWidget
 {
     Q_OBJECT
 public:
-    LayerDock(Project* project, MapLabel* imageLabel);
+    LayerDock(QSqlDatabase* db, Project* project, MapLabel* imageLabel);
 
     void update();
 
@@ -32,6 +32,7 @@ public slots:
     void moveDown();
 
 private:
+    QSqlDatabase db_;
     Project* project_;
     MapLabel* imageLabel_;
     QTreeWidget *tree_ = new QTreeWidget();
@@ -40,6 +41,7 @@ private:
     void setProject(Project* value);
     MapLabel* getImageLabel();
     void setImageLabel(MapLabel* value);
+    QSqlQuery *query;
 
 };
 
